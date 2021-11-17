@@ -34,4 +34,12 @@ module.exports = {
             title: "Figma"
         }),
     ],
+    devServer: {
+        static: {
+            directory: resolve(__dirname, "../dist"),
+        },
+        compress: true,
+        port: 11010,
+        open: true,
+    }
 }
