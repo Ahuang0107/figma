@@ -3,17 +3,22 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: "development",
-    entry: "./src/renderer",
+    entry: "./src",
     output: {
-        path: resolve(__dirname, "../dist"),
+        path: resolve(__dirname, "dist"),
         filename: 'bundle.js',
     },
     resolve: {
-        extensions: [".jsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".jsx"],
         mainFiles: ["index"],
     },
     module: {
         rules: [
+            {
+                test: /\.tsx?$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
             {
                 test: /\.jsx$/,
                 exclude: /node_modules/,
@@ -45,7 +50,7 @@ module.exports = {
     ],
     devServer: {
         static: {
-            directory: resolve(__dirname, "../dist"),
+            directory: resolve(__dirname, "dist"),
         },
         compress: true,
         port: 11010,
