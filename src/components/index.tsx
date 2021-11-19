@@ -1,5 +1,7 @@
 import * as React from "react";
+import {inject} from "mobx-react";
 
+@inject("themes")
 class App extends React.Component {
     render() {
         return (
