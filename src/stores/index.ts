@@ -1,10 +1,24 @@
-import {observable} from "mobx";
+import {action, computed, observable} from "mobx";
 
-class Themes {
-    @observable mode: "dark" | "light";
+type Mode = "dark" | "light"
+
+export class Themes {
+    @observable mode: Mode = "dark"
+
+    constructor() {
+    }
+
+    @computed get isDark() {
+        return this.mode == "dark"
+    }
+
+    @action
+    changeThemesMode = () => {
+        this.mode = "light"
+    }
 }
 
-const themes = new Themes()
+export const themes = new Themes()
 
 const stores = {
     themes
