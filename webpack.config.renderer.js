@@ -1,12 +1,15 @@
-const {resolve} = require("path");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
 
 module.exports = {
     mode: "development",
-    entry: "./src",
+    entry: path.join(__dirname, 'src/renderer/index.tsx'),
     output: {
-        path: resolve(__dirname, "dist"),
-        filename: 'bundle.js',
+        path: path.join(__dirname, 'dist/renderer'),
+        filename: 'renderer.js',
+        library: {
+            type: 'umd',
+        },
     },
     resolve: {
         extensions: [".ts", ".tsx", ".js", ".jsx"],
@@ -39,12 +42,4 @@ module.exports = {
             title: "Figma"
         }),
     ],
-    devServer: {
-        static: {
-            directory: resolve(__dirname, "dist"),
-        },
-        compress: true,
-        port: 11010,
-        open: true,
-    }
 }
