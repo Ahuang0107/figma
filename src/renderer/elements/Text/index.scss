@@ -1,10 +1,10 @@
 .text {
-  //--fontSize: 16px;
-  //--fontSubtitleSize: 18px;
-  //--fontTitleSize: 22px;
-  //--text-active: #050505;
-  //--text-disabled: #b3b3b3;
-  //--fg-tab-active: #ffffff;
+  --fontSize: 16px;
+  --fontSubtitleSize: 18px;
+  --fontTitleSize: 22px;
+  --text-active: #050505;
+  --text-disabled: #b3b3b3;
+  --fg-tab-active: #ffffff;
   font: {
     size: var(--fontSize);
     family: 'Inter', sans-serif;
