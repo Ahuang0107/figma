@@ -18,15 +18,6 @@
   transition: all .1s ease;
   user-select: none;
 
-  --text: #333333;
-  --bg-toolbar-active: #18a0fb;
-  --fg-toolbar-active: #ffffff;
-  --bg-header-control: #222222;
-  --fg-header-control: #ffffff;
-  --bg-header-control-hover: #2c2c2c;
-  --bg-window-close: #e81123;
-  --text-disabled: #b3b3b3;
-
   &_primary {
     padding: var(--buttonHeightS) var(--buttonWidthM);
     border: 1px solid var(--text);

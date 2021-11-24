@@ -1,17 +1,16 @@
 import {makeAutoObservable} from "mobx";
-
-type Mode = "dark" | "light"
+import {DEFAULT_THEME} from "../../constants";
 
 export class Themes {
-    mode: Mode = "dark"
 
     constructor() {
         makeAutoObservable(this);
     }
 
-    changeThemesMode = () => {
-        this.mode = "light"
-    }
+    getCurrentTheme = (): Themes.Theme => {
+        return DEFAULT_THEME;
+    };
+
 }
 
 export const themes = new Themes()
