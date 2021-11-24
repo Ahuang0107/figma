@@ -8,12 +8,20 @@
     "start": "electron ./dist/main/main.js",
     "build": "yarn run build:main && yarn run build:renderer",
     "build:main": "webpack --config webpack.config.main.js",
-    "build:renderer": "webpack --config webpack.config.renderer.js"
+    "build:renderer": "webpack --config webpack.config.renderer.js",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.4",
     "@babel/preset-react": "^7.16.0",
+    "@storybook/addon-actions": "^6.3.12",
+    "@storybook/addon-essentials": "^6.3.12",
+    "@storybook/addon-links": "^6.3.12",
+    "@storybook/builder-webpack5": "^6.3.12",
+    "@storybook/manager-webpack5": "^6.3.12",
+    "@storybook/react": "^6.3.12",
     "@types/react": "^17.0.35",
     "@types/react-dom": "^17.0.11",
     "babel-loader": "^8.2.3",
