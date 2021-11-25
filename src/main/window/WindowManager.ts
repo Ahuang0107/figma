@@ -1,4 +1,6 @@
 import * as E from "electron";
+import {URL} from "url";
+import * as path from "path";
 
 class WindowManager {
     mainWindow: E.BrowserWindow;
@@ -22,8 +24,26 @@ class WindowManager {
             },
         };
         this.mainWindow = new E.BrowserWindow(options);
-        this.mainWindow.loadFile('../renderer/index.html').then(() => {
+        if (process.env.NODE_ENV === 'development') {
+            const port = process.env.PORT || 12000;
+            const url = new URL(`http://localhost:${port}`);
+            url.pathname = 'index.html';
+        }
+        this.mainWindow.loadURL(this.resolveHtmlPath('index.html')).then(() => {
         })
+    }
+
+    private resolveHtmlPath = (htmlFileName: string) => {
+        console.log(process.env.NODE_ENV)
+        if (process.env.NODE_ENV === 'development') {
+            const port = process.env.PORT;
+            const url = new URL(`http://localhost:${port}`);
+            url.pathname = htmlFileName;
+            return url.href;
+        } else {
+            const rootFolder = process.cwd();
+            return `file://${path.resolve(rootFolder, 'dist/renderer/', htmlFileName)}`;
+        }
     }
 
     private static _instance: WindowManager;
