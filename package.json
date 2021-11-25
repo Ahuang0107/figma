@@ -7,8 +7,8 @@
   "scripts": {
     "start": "electron ./dist/main/main.js",
     "build": "yarn run build:main && yarn run build:renderer",
-    "build:main": "webpack --config webpack.config.main.js",
-    "build:renderer": "webpack --config webpack.config.renderer.js",
+    "build:main": "webpack --config config/webpack.config.main.js",
+    "build:renderer": "webpack --config config/webpack.config.renderer.js",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

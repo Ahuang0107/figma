@@ -1,11 +1,13 @@
 const path = require("path");
 
+const rootFolder = process.cwd();
+
 module.exports = {
     mode: "development",
-    entry: path.join(__dirname, 'src/main/index.ts'),
+    entry: path.join(rootFolder, 'src/main/index.ts'),
     target: 'electron-main',
     output: {
-        path: path.join(__dirname, 'dist/main'),
+        path: path.join(rootFolder, 'dist/main'),
         filename: '[name].js',
         library: {
             type: 'commonjs2',

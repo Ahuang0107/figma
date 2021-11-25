@@ -1,11 +1,13 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require("path");
 
+const rootFolder = process.cwd();
+
 module.exports = {
     mode: "development",
-    entry: path.join(__dirname, 'src/renderer/index.tsx'),
+    entry: path.join(rootFolder, 'src/renderer/index.tsx'),
     output: {
-        path: path.join(__dirname, 'dist/renderer'),
+        path: path.join(rootFolder, 'dist/renderer'),
         filename: 'renderer.js',
         library: {
             type: 'umd',
@@ -21,7 +23,14 @@ module.exports = {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
                 use: [
-                    "babel-loader",
+                    {
+                        loader: "babel-loader",
+                        options: {
+                            presets: [
+                                "@babel/preset-react"
+                            ],
+                        }
+                    },
                     'ts-loader',
                 ],
             },
@@ -38,7 +47,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: "./src/index.html",
+            template: path.join(rootFolder, 'src/index.html'),
             title: "Figma"
         }),
     ],
