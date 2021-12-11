@@ -7,6 +7,17 @@ const rootFolder = process.cwd();
 module.exports = () => {
     const isProduction = process.env.NODE_ENV === 'production';
     const port = process.env.PORT;
+    const with_main = process.env.WITH_MAIN === 'ture';
+    const onBeforeSetupMiddleware = () => {
+        console.log('Starting Main Process...');
+        spawn('yarn', ['run', 'start:main'], {
+            shell: true,
+            env: process.env,
+            stdio: 'inherit',
+        })
+            .on('close', (code) => process.exit(code))
+            .on('error', (spawnError) => console.error(spawnError));
+    }
     return {
         mode: isProduction ? 'production' : 'development',
         entry: path.join(rootFolder, 'src/renderer/index.tsx'),
@@ -64,16 +75,8 @@ module.exports = () => {
             port: port,
             compress: true,
             hot: true,
-            onBeforeSetupMiddleware() {
-                console.log('Starting Main Process...');
-                spawn('yarn', ['run', 'start:main'], {
-                    shell: true,
-                    env: process.env,
-                    stdio: 'inherit',
-                })
-                    .on('close', (code) => process.exit(code))
-                    .on('error', (spawnError) => console.error(spawnError));
-            }
+            onBeforeSetupMiddleware: with_main ? onBeforeSetupMiddleware : () => {
+            },
         }
     }
 }
