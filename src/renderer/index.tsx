@@ -3,6 +3,7 @@ import {render} from "react-dom";
 import {Provider} from "mobx-react";
 import App from "./components";
 import stores from "./stores";
+import "./style.scss";
 
 render(
     <Provider {...stores}>
