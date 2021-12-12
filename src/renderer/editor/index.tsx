@@ -1,7 +1,7 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {initCanvasKitAndFont} from "./utils";
 import {SkyView} from "./view/sky-view";
-import ReactDOM = require("react-dom");
 
 export class Canvas extends React.Component {
     private myRef: React.LegacyRef<HTMLCanvasElement>;
@@ -10,8 +10,7 @@ export class Canvas extends React.Component {
     componentDidMount() {
         initCanvasKitAndFont().then(() => {
             const canvasElement: HTMLCanvasElement = ReactDOM.findDOMNode(this) as HTMLCanvasElement;
-            let skyView = new SkyView(canvasElement);
-            skyView?.renderPage();
+            this.skyView = new SkyView(canvasElement);
         })
     }
 
