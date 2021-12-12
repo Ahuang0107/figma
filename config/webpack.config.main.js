@@ -6,7 +6,7 @@ module.exports = () => {
     const isProduction = process.env.NODE_ENV === 'production';
     return {
         mode: isProduction ? 'production' : 'development',
-        entry: path.join(rootFolder, 'src/main/index.ts'),
+        entry: path.join(rootFolder, 'src/main/index.tsx'),
         target: 'electron-main',
         output: {
             path: path.join(rootFolder, 'dist/main'),

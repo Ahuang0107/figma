@@ -32,6 +32,10 @@ module.exports = () => {
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".jsx"],
             mainFiles: ["index"],
+            fallback: {
+                fs: false,
+                path: require.resolve('path-browserify'),
+            }
         },
         module: {
             rules: [
