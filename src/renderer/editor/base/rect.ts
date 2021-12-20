@@ -1,4 +1,5 @@
 import sk from "../utils/canvas-kit";
+import {CanvasView} from "../view/canvas-view";
 
 export class Rect {
     constructor(
@@ -26,6 +27,7 @@ export class Rect {
     }
 
     toSk() {
-        return sk.CanvasKit.XYWHRect(this.x, this.y, this.width, this.height);
+        const {scale} = CanvasView.currentContext;
+        return sk.CanvasKit.XYWHRect(this.x * scale, this.y * scale, this.width * scale, this.height * scale);
     }
 }

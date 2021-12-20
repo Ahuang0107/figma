@@ -3,6 +3,7 @@ import sk, {Color, fontMgr} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Page} from "./page";
 import {Layer} from "./layer";
+import {Point} from "../base/point";
 
 export class CanvasView {
     static currentContext: CanvasView;
@@ -16,6 +17,9 @@ export class CanvasView {
     pages: Page[] = [];
 
     currentPage: Page;
+
+    scale: number = 1;
+    offset: Point = new Point(0, 0);
 
     constructor(canvasEl: HTMLCanvasElement) {
         this.canvasEl = canvasEl;
@@ -66,6 +70,20 @@ export class CanvasView {
             this.currentPage.layers.forEach((layer) => {
                 layer.isHovered = false;
             })
+        })
+        this.canvasEl.addEventListener("wheel", (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                e.stopPropagation();
+                const positionX = e.offsetX;
+                const positionY = e.offsetY;
+                console.log(e);
+                if (e.deltaY > 0) {
+                    this.scale += 0.01;
+                } else {
+                    this.scale -= 0.01;
+                }
+            }
         })
     }
 
