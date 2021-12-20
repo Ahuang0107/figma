@@ -1,6 +1,8 @@
 import {Canvas, FontMgr, Surface} from "canvaskit-wasm";
-import sk, {fontMgr} from "../utils/canvas-kit";
+import sk, {Color, fontMgr} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
+import {Page} from "./page";
+import {Layer} from "./layer";
 
 export class CanvasView {
     static currentContext: CanvasView;
@@ -10,6 +12,10 @@ export class CanvasView {
     skSurface!: Surface;
     skCanvas!: Canvas;
     fontMgr!: FontMgr;
+
+    pages: Page[] = [];
+
+    currentPage: Page;
 
     constructor(canvasEl: HTMLCanvasElement) {
         this.canvasEl = canvasEl;
@@ -22,22 +28,21 @@ export class CanvasView {
         CanvasView.currentContext = this;
 
         this.initSchedule();
+
+        const page = new Page();
+        const layer = new Layer(new Rect(40, 50, 300, 500));
+        const layer2 = new Layer(new Rect(400, 50, 300, 500));
+        page.appendLayer(layer);
+        page.appendLayer(layer2);
+        this.appendPage(page);
+        this.currentPage = this.pages[0];
+
+        this.blingEvent();
     }
 
     render() {
-        this.skCanvas.clear(sk.CanvasKit.Color(229, 229, 229));
-        const rect = new Rect(40, 50, 300, 500);
-        const fillPaint = new sk.CanvasKit.Paint();
-        fillPaint.setColor(sk.CanvasKit.Color(255, 255, 255));
-        fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-
-        const strokePaint = new sk.CanvasKit.Paint();
-        strokePaint.setColor(sk.CanvasKit.Color(24, 160, 251));
-        strokePaint.setStyle(sk.CanvasKit.PaintStyle.Stroke);
-        strokePaint.setStrokeWidth(1);
-
-        const skRect = rect.toSk();
-        this.skCanvas.drawRect(skRect, fillPaint);
+        this.skCanvas.clear(Color.GREY);
+        this.currentPage.render();
         this.skSurface.flush();
     }
 
@@ -48,10 +53,19 @@ export class CanvasView {
         this.canvasEl.height = bounds.height;
     }
 
-    addListener() {
+    blingEvent() {
         this.canvasEl.addEventListener("mousemove", (e) => {
+            const bounds = this.canvasEl.getBoundingClientRect();
+            this.currentPage.layers.forEach((layer) => {
+                const isXInCanvas = (e.clientX >= (bounds.left + layer.rect.left) && e.clientX <= (bounds.left + layer.rect.right));
+                const isYInCanvas = (e.clientY >= (bounds.top + layer.rect.top) && e.clientY <= (bounds.top + layer.rect.bottom));
+                layer.isHovered = isXInCanvas && isYInCanvas;
+            })
         })
         this.canvasEl.addEventListener("mouseleave", (e) => {
+            this.currentPage.layers.forEach((layer) => {
+                layer.isHovered = false;
+            })
         })
     }
 
@@ -62,5 +76,9 @@ export class CanvasView {
             window.requestAnimationFrame(renderSchedule);
         };
         window.requestAnimationFrame(renderSchedule);
+    }
+
+    appendPage(page: Page) {
+        this.pages.push(page);
     }
 }

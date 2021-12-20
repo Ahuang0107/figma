@@ -44,8 +44,23 @@ const getFontMgr = () => {
         });
 };
 
+interface Color {
+    GREY: Float32Array
+    WHITE: Float32Array
+    BLUE: Float32Array
+}
+
+export let Color: Color;
+
 export function initCanvasKitAndFont() {
-    return CanvasKitPromised.then(() => getFontMgr());
+    return CanvasKitPromised.then(() => {
+        getFontMgr()
+        Color = {
+            GREY: sk.CanvasKit.Color(229, 229, 229),
+            WHITE: sk.CanvasKit.Color(255, 255, 255),
+            BLUE: sk.CanvasKit.Color(24, 160, 251)
+        }
+    });
 }
 
 export default sk;
