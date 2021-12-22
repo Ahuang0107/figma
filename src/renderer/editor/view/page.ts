@@ -1,16 +1,13 @@
-import {Color} from "../utils/canvas-kit";
-import {Layer} from "./layer";
 import {CanvasView} from "./canvas-view";
+import {Layer} from "../layer";
 
 export class Page {
-    background: Float32Array;
 
     layers: Layer[] = [];
 
     ctx: CanvasView;
 
     constructor() {
-        this.background = Color.GREY;
         this.ctx = CanvasView.currentContext;
     }
 

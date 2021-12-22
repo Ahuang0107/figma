@@ -1,24 +1,23 @@
-import {Rect} from "../base/rect";
-import {CanvasView} from "./canvas-view";
 import sk, {Color} from "../utils/canvas-kit";
+import {BaseLayer} from "./base-layer";
+import {Rect} from "../base/rect";
 
-export class Layer {
-    rotation: number = 0;
-
-    ctx: CanvasView;
+export class FrameLayer extends BaseLayer {
     isHovered: boolean = false;
 
-    constructor(public rect: Rect) {
+    fillColor: Float32Array = Color.WHITE;
+    strokeColor: Float32Array = Color.BLUE;
 
-        this.ctx = CanvasView.currentContext;
+    constructor(rect: Rect) {
+        super(rect);
     }
 
     render() {
         const fillPaint = new sk.CanvasKit.Paint();
-        fillPaint.setColor(Color.WHITE);
+        fillPaint.setColor(this.fillColor);
         fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
         const strokePaint = new sk.CanvasKit.Paint();
-        strokePaint.setColor(Color.BLUE);
+        strokePaint.setColor(this.strokeColor);
         strokePaint.setStyle(sk.CanvasKit.PaintStyle.Stroke);
         strokePaint.setStrokeWidth(1);
         if (this.isHovered) {

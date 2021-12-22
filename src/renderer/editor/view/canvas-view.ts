@@ -2,8 +2,8 @@ import {Canvas, FontMgr, Surface} from "canvaskit-wasm";
 import sk, {Color, fontMgr} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Page} from "./page";
-import {Layer} from "./layer";
 import {Point} from "../base/point";
+import {FrameLayer, ShapeLayer} from "../layer";
 
 export class CanvasView {
     static currentContext: CanvasView;
@@ -34,8 +34,10 @@ export class CanvasView {
         this.initSchedule();
 
         const page = new Page();
-        const layer = new Layer(new Rect(40, 50, 300, 500));
-        const layer2 = new Layer(new Rect(400, 50, 300, 500));
+        const layer = new FrameLayer(new Rect(40, 50, 1080, 720));
+        layer.fillColor = Color.PURE_BLACK;
+        const layer2 = new ShapeLayer(new Rect(200, 150, 750, 500));
+        layer2.fillColor = Color.BLUEISH_BLACK;
         page.appendLayer(layer);
         page.appendLayer(layer2);
         this.appendPage(page);
