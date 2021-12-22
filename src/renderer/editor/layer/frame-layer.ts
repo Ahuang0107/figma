@@ -3,7 +3,6 @@ import {BaseLayer} from "./base-layer";
 import {Rect} from "../base/rect";
 
 export class FrameLayer extends BaseLayer {
-    isHovered: boolean = false;
 
     fillColor: Float32Array = Color.WHITE;
     strokeColor: Float32Array = Color.BLUE;

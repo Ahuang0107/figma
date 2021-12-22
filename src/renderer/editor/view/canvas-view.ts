@@ -4,6 +4,7 @@ import {Rect} from "../base/rect";
 import {Page} from "./page";
 import {Point} from "../base/point";
 import {FrameLayer, ShapeLayer} from "../layer";
+import {fromEvent, Observable} from "rxjs";
 
 export class CanvasView {
     static currentContext: CanvasView;
@@ -21,6 +22,10 @@ export class CanvasView {
     scale: number = 1;
     offset: Point = new Point(0, 0);
 
+    mousemoveEvent: Observable<MouseEvent>
+    mouseleaveEvent: Observable<MouseEvent>
+    wheelEvent: Observable<WheelEvent>
+
     constructor(canvasEl: HTMLCanvasElement) {
         this.canvasEl = canvasEl;
         this.reSize();
@@ -30,6 +35,7 @@ export class CanvasView {
 
         this.fontMgr = fontMgr;
         CanvasView.currentContext = this;
+        this.blingEvent();
 
         this.initSchedule();
 
@@ -42,8 +48,6 @@ export class CanvasView {
         page.appendLayer(layer2);
         this.appendPage(page);
         this.currentPage = this.pages[0];
-
-        this.blingEvent();
     }
 
     render() {
@@ -60,26 +64,13 @@ export class CanvasView {
     }
 
     blingEvent() {
-        this.canvasEl.addEventListener("mousemove", (e) => {
-            const bounds = this.canvasEl.getBoundingClientRect();
-            this.currentPage.layers.forEach((layer) => {
-                const isXInCanvas = (e.clientX >= (bounds.left + layer.rect.left) && e.clientX <= (bounds.left + layer.rect.right));
-                const isYInCanvas = (e.clientY >= (bounds.top + layer.rect.top) && e.clientY <= (bounds.top + layer.rect.bottom));
-                layer.isHovered = isXInCanvas && isYInCanvas;
-            })
-        })
-        this.canvasEl.addEventListener("mouseleave", (e) => {
-            this.currentPage.layers.forEach((layer) => {
-                layer.isHovered = false;
-            })
-        })
-        this.canvasEl.addEventListener("wheel", (e) => {
+        this.mousemoveEvent = fromEvent<MouseEvent>(this.canvasEl, "mousemove");
+        this.mouseleaveEvent = fromEvent<MouseEvent>(this.canvasEl, "mouseleave");
+        this.wheelEvent = fromEvent<WheelEvent>(this.canvasEl, "wheel");
+        this.wheelEvent.subscribe((e) => {
             if (e.ctrlKey) {
                 e.preventDefault();
                 e.stopPropagation();
-                const positionX = e.offsetX;
-                const positionY = e.offsetY;
-                console.log(e);
                 if (e.deltaY > 0) {
                     this.scale += 0.01;
                 } else {

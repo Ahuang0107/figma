@@ -10,22 +10,6 @@ export class Rect {
     ) {
     }
 
-    get left() {
-        return this.x
-    }
-
-    get right() {
-        return this.x + this.width
-    }
-
-    get top() {
-        return this.y
-    }
-
-    get bottom() {
-        return this.y + this.height
-    }
-
     toSk() {
         const {scale} = CanvasView.currentContext;
         return sk.CanvasKit.XYWHRect(this.x * scale, this.y * scale, this.width * scale, this.height * scale);
