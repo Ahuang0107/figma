@@ -10,7 +10,7 @@ export class Rect {
     ) {
     }
 
-    toSk() {
+    toRect() {
         const {scale} = CanvasView.currentContext;
         return sk.CanvasKit.XYWHRect(this.x * scale, this.y * scale, this.width * scale, this.height * scale);
     }

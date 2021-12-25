@@ -1,5 +1,5 @@
 import * as CanvasKitInitFn from "canvaskit-wasm";
-import {CanvasKit, FontMgr} from "canvaskit-wasm";
+import {CanvasKit, FontMgr, ParagraphBuilder, ParagraphStyle} from "canvaskit-wasm";
 import "../../../assets/fonts/Roboto-Regular.ttf";
 import "../../../assets/fonts/HarmonyOSSansSC-Regular.ttf";
 import "../../../assets/fonts/colorfulemoji.woff2";
@@ -56,7 +56,6 @@ export let Color: Color;
 
 export function initCanvasKitAndFont() {
     return CanvasKitPromised.then(() => {
-        getFontMgr()
         Color = {
             GREY: sk.CanvasKit.Color(53, 53, 53),
             WHITE: sk.CanvasKit.Color(255, 255, 255),
@@ -64,7 +63,14 @@ export function initCanvasKitAndFont() {
             PURE_BLACK: sk.CanvasKit.Color(0, 0, 0),
             BLUEISH_BLACK: sk.CanvasKit.Color(20, 20, 44),
         }
+        return getFontMgr()
     });
+}
+
+export class ParagraphFactory {
+    static createParagraph(paraStyle: ParagraphStyle): ParagraphBuilder {
+        return sk.CanvasKit.ParagraphBuilder.Make(paraStyle, fontMgr);
+    }
 }
 
 export default sk;

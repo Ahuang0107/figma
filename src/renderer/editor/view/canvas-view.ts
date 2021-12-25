@@ -2,8 +2,7 @@ import {Canvas, FontMgr, Surface} from "canvaskit-wasm";
 import sk, {Color, fontMgr} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Page} from "./page";
-import {Point} from "../base/point";
-import {FrameLayer, ShapeLayer} from "../layer";
+import {FrameLayer, ShapeLayer, TextLayer} from "../layer";
 import {fromEvent, Observable} from "rxjs";
 
 export class CanvasView {
@@ -20,7 +19,6 @@ export class CanvasView {
     currentPage: Page;
 
     scale: number = 1;
-    offset: Point = new Point(0, 0);
 
     mousemoveEvent: Observable<MouseEvent>
     mouseleaveEvent: Observable<MouseEvent>
@@ -39,13 +37,19 @@ export class CanvasView {
 
         this.initSchedule();
 
+        this.mockData();
+    }
+
+    mockData() {
         const page = new Page();
         const layer = new FrameLayer(new Rect(40, 50, 1080, 720));
         layer.fillColor = Color.PURE_BLACK;
-        const layer2 = new ShapeLayer(new Rect(200, 150, 750, 500));
+        const layer2 = new ShapeLayer(new Rect(150, 250, 856, 363), 10);
         layer2.fillColor = Color.BLUEISH_BLACK;
+        const textLayer = new TextLayer(new Rect(200, 300, 100, 30), "apple");
         page.appendLayer(layer);
         page.appendLayer(layer2);
+        page.appendLayer(textLayer);
         this.appendPage(page);
         this.currentPage = this.pages[0];
     }

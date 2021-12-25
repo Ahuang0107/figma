@@ -17,7 +17,7 @@ export class Page {
 
     render() {
         this.layers.forEach((layer) => {
-            layer.render();
+            layer.renderLayer();
         })
     }
 }

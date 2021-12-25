@@ -1,6 +1,7 @@
 import {Rect} from "../base/rect";
 import {CanvasView} from "../view/canvas-view";
 import {Position} from "../base/position";
+import sk, {Color} from "../utils/canvas-kit";
 
 let uid = 1;
 
@@ -29,4 +30,19 @@ export abstract class BaseLayer {
     }
 
     abstract render(): void;
+
+    renderLayer() {
+        this.render();
+        this.renderHover();
+    }
+
+    renderHover() {
+        if (this.isHovered) {
+            const strokePaint = new sk.CanvasKit.Paint();
+            strokePaint.setColor(Color.BLUE);
+            strokePaint.setStyle(sk.CanvasKit.PaintStyle.Stroke);
+            strokePaint.setStrokeWidth(1);
+            this.ctx.skCanvas.drawRect(this.rect.toRect(), strokePaint);
+        }
+    }
 }
