@@ -8,7 +8,6 @@ let uid = 1;
 export abstract class BaseLayer {
     ctx: CanvasView;
     id: number;
-    isHovered: boolean = false;
 
     protected constructor(public rect: Rect) {
         this.ctx = CanvasView.currentContext;
@@ -18,11 +17,15 @@ export abstract class BaseLayer {
             const position = this.getPosition();
             const isXInCanvas = (e.clientX >= (bounds.left + position.left) && e.clientX <= (bounds.left + position.right));
             const isYInCanvas = (e.clientY >= (bounds.top + position.top) && e.clientY <= (bounds.top + position.bottom));
-            this.isHovered = isXInCanvas && isYInCanvas;
+            if (isXInCanvas && isYInCanvas) this.ctx.isHoveredLayerId = this.id;
         });
         this.ctx.mouseleaveEvent.subscribe((e) => {
-            this.isHovered = false;
+            this.ctx.isHoveredLayerId = null;
         });
+    }
+
+    get isHovered() {
+        return this.id == this.ctx.isHoveredLayerId
     }
 
     getPosition(): Position {

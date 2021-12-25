@@ -3,7 +3,6 @@ import {BaseLayer} from "./base-layer";
 import {Rect} from "../base/rect";
 
 export class ShapeLayer extends BaseLayer {
-    isHovered: boolean = false;
 
     fillColor: Float32Array = Color.WHITE;
 

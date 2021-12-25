@@ -20,9 +20,11 @@ export class CanvasView {
 
     scale: number = 1;
 
-    mousemoveEvent: Observable<MouseEvent>
-    mouseleaveEvent: Observable<MouseEvent>
-    wheelEvent: Observable<WheelEvent>
+    mousemoveEvent: Observable<MouseEvent>;
+    mouseleaveEvent: Observable<MouseEvent>;
+    wheelEvent: Observable<WheelEvent>;
+
+    isHoveredLayerId: number | null = null;
 
     constructor(canvasEl: HTMLCanvasElement) {
         this.canvasEl = canvasEl;
