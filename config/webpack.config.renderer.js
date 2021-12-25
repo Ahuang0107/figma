@@ -1,4 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require("path");
 const {spawn} = require("child_process");
 
@@ -76,6 +77,11 @@ module.exports = () => {
             new HtmlWebpackPlugin({
                 template: path.join(rootFolder, 'src/index.html'),
                 title: "Figma"
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm'}
+                ]
             }),
         ],
         devtool: isProduction ? 'source-map' : 'inline-source-map',

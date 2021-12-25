@@ -4,20 +4,18 @@ import "../../../assets/fonts/Roboto-Regular.ttf";
 import "../../../assets/fonts/HarmonyOSSansSC-Regular.ttf";
 import "../../../assets/fonts/colorfulemoji.woff2";
 
-let canvasKitWasm = require("!!file-loader!canvaskit-wasm/bin/canvaskit.wasm");
-canvasKitWasm = canvasKitWasm.default || canvasKitWasm;
+const CanvasKitInit = require('canvaskit-wasm/bin/canvaskit.js');
 
 const sk = {} as {
     CanvasKit: CanvasKit;
 };
 
-const CanvasKitPromised = (CanvasKitInitFn as any)({
-    locateFile: canvasKitWasm && (() => canvasKitWasm)
-}).then((CanvasKit: CanvasKitInitFn.CanvasKit) => {
-    sk.CanvasKit = CanvasKit;
-    (window as any).CanvasKit = CanvasKit;
-    return sk.CanvasKit;
-});
+const CanvasKitPromised = CanvasKitInit()
+    .then((CanvasKit: CanvasKitInitFn.CanvasKit) => {
+        sk.CanvasKit = CanvasKit;
+        (window as any).CanvasKit = CanvasKit;
+        return sk.CanvasKit;
+    });
 
 export let fontMgr: FontMgr | undefined;
 
