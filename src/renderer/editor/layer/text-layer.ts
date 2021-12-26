@@ -4,9 +4,13 @@ import {Rect} from "../base/rect";
 import {CanvasView} from "../view/canvas-view";
 
 export class TextLayer extends BaseLayer {
-    DEFAULT_FONT_SIZE = 28;
 
-    constructor(rect: Rect, public text: string, public fillColor: Float32Array = Color.WHITE) {
+    constructor(
+        rect: Rect,
+        public text: string,
+        public fontSize: number = 20,
+        public fillColor: Float32Array = Color.WHITE,
+    ) {
         super(rect);
     }
 
@@ -16,7 +20,7 @@ export class TextLayer extends BaseLayer {
         const paraStyle = new sk.CanvasKit.ParagraphStyle({
             textStyle: {
                 color: this.fillColor,
-                fontSize: this.DEFAULT_FONT_SIZE * scale,
+                fontSize: this.fontSize * scale,
             }
         });
         const builder = ParagraphFactory.createParagraph(paraStyle);
