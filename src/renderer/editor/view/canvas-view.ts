@@ -3,12 +3,14 @@ import sk, {Color, fontMgr} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Page} from "./page";
 import {FrameLayer, ShapeLayer, TextLayer} from "../layer";
-import {fromEvent, Observable} from "rxjs";
+import {fromEvent, Observable, Subscription} from "rxjs";
+import {Point} from "../base/point";
+import {DrawFactory, ShapeDrawer} from "../draw/draw-factory";
 
 export class CanvasView {
     static currentContext: CanvasView;
 
-    canvasEl: HTMLCanvasElement
+    canvasEl: HTMLCanvasElement;
 
     skSurface!: Surface;
     skCanvas!: Canvas;
@@ -20,9 +22,14 @@ export class CanvasView {
 
     scale: number = 1;
 
+    mousedownEvent: Observable<MouseEvent>;
+    mouseupEvent: Observable<MouseEvent>;
     mousemoveEvent: Observable<MouseEvent>;
     mouseleaveEvent: Observable<MouseEvent>;
     wheelEvent: Observable<WheelEvent>;
+
+    drawing: ShapeDrawer | null = null;
+    drawingSubscription: Subscription | null = null;
 
     isHoveredLayerId: number | null = null;
 
@@ -35,6 +42,7 @@ export class CanvasView {
 
         this.fontMgr = fontMgr;
         CanvasView.currentContext = this;
+        this.initEvent();
         this.blingEvent();
 
         this.initSchedule();
@@ -105,10 +113,15 @@ export class CanvasView {
         this.canvasEl.height = bounds.height;
     }
 
-    blingEvent() {
+    initEvent() {
+        this.mousedownEvent = fromEvent<MouseEvent>(this.canvasEl, "mousedown");
+        this.mouseupEvent = fromEvent<MouseEvent>(this.canvasEl, "mouseup");
         this.mousemoveEvent = fromEvent<MouseEvent>(this.canvasEl, "mousemove");
         this.mouseleaveEvent = fromEvent<MouseEvent>(this.canvasEl, "mouseleave");
         this.wheelEvent = fromEvent<WheelEvent>(this.canvasEl, "wheel");
+    }
+
+    blingEvent() {
         this.wheelEvent.subscribe((e) => {
             if (e.ctrlKey) {
                 e.preventDefault();
@@ -118,6 +131,28 @@ export class CanvasView {
                 } else {
                     this.scale -= 0.01;
                 }
+            }
+        })
+        this.mousedownEvent.subscribe((e) => {
+            this.drawing = DrawFactory.create(new Point(e.offsetX, e.offsetY));
+            this.currentPage.layers.push(this.drawing.toLayer());
+            this.drawingSubscription =
+                this.mousemoveEvent.subscribe((e) => {
+                    this.drawing.updateSize(new Point(e.offsetX, e.offsetY));
+                    this.currentPage.layers.pop();
+                    this.currentPage.layers.push(this.drawing.toLayer());
+                });
+        });
+        this.mouseupEvent.subscribe((e) => {
+            this.drawing = null;
+            if (this.drawingSubscription) {
+                this.drawingSubscription.unsubscribe();
+            }
+        });
+        this.mouseleaveEvent.subscribe((e) => {
+            this.drawing = null;
+            if (this.drawingSubscription) {
+                this.drawingSubscription.unsubscribe();
             }
         })
     }

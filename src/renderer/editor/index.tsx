@@ -21,7 +21,7 @@ export class Canvas extends React.Component {
     render(): JSX.Element {
         this.myRef = React.createRef();
         return (
-            <canvas ref={this.myRef} style={{position: "absolute"}}/>
+            <canvas ref={this.myRef} style={{position: "absolute", userSelect: "none"}}/>
         )
     }
 }
