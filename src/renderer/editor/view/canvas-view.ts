@@ -150,7 +150,10 @@ export class CanvasView {
             }
         });
         this.mouseleaveEvent.subscribe((e) => {
-            this.drawing = null;
+            if (this.drawing != null) {
+                this.currentPage.layers.pop();
+                this.drawing = null;
+            }
             if (this.drawingSubscription) {
                 this.drawingSubscription.unsubscribe();
             }
