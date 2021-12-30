@@ -27,6 +27,7 @@ export class TextLayer extends BaseLayer {
         builder.addText(this.text);
         builder.pop();
         const paragraph = builder.build();
+        // todo issue [Uncaught RuntimeError: abort(undefined).]
         paragraph.layout(this.rect.width * scale);
         if (this.isHovered) {
 
