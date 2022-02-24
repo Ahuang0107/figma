@@ -1,13 +1,18 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = (isProd) => {
     const rootFolder = process.cwd();
     return {
-        entry: path.join(rootFolder, 'src/demo/index.tsx'),
+        entry: path.join(rootFolder, 'src/index.tsx'),
         resolve: {
             extensions: ['.tsx', '.ts', '.js'],
+            fallback: {
+                fs: false,
+                path: require.resolve('path-browserify'),
+            }
         },
         module: {
             rules: [
@@ -68,6 +73,14 @@ module.exports = (isProd) => {
             new MiniCssExtractPlugin({
                 filename: 'css/[name].[contenthash:8].css',
                 chunkFilename: 'css/[name].[contenthash:8].chunk.css',
+            }),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm',
+                        to: 'js/'
+                    }
+                ]
             }),
         ],
     }
