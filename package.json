@@ -5,13 +5,8 @@
   "author": "elase",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=development PORT=9000 WITH_MAIN=ture TS_NODE_TRANSPILE_ONLY=true webpack serve --config config/webpack.config.renderer.js",
-    "start:main": "cross-env NODE_ENV=development PORT=9000 electron -r ts-node/register/transpile-only src/main/index.ts",
-    "start:renderer": "cross-env NODE_ENV=development PORT=9000 WITH_MAIN=false TS_NODE_TRANSPILE_ONLY=true webpack serve --config config/webpack.config.renderer.js",
-    "run": "electron dist/main/main.js",
-    "build": "yarn run build:main && yarn run build:renderer",
-    "build:main": "cross-env NODE_ENV=production webpack --config config/webpack.config.main.js",
-    "build:renderer": "cross-env NODE_ENV=production webpack --config config/webpack.config.renderer.js",
+    "start": "cross-env NODE_ENV=development PORT=9000 TS_NODE_TRANSPILE_ONLY=true webpack serve --config config/webpack.config.js",
+    "build": "cross-env webpack --config config/webpack.config.js",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook"
   },

@@ -1,31 +1,19 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require("path");
-const {spawn} = require("child_process");
 
 const rootFolder = process.cwd();
 
 module.exports = () => {
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = process.env.NODE_ENV !== 'dev';
     const port = process.env.PORT;
-    const with_main = process.env.WITH_MAIN === 'ture';
-    const onBeforeSetupMiddleware = () => {
-        console.log('Starting Main Process...');
-        spawn('yarn', ['run', 'start:main'], {
-            shell: true,
-            env: process.env,
-            stdio: 'inherit',
-        })
-            .on('close', (code) => process.exit(code))
-            .on('error', (spawnError) => console.error(spawnError));
-    }
     return {
         mode: isProduction ? 'production' : 'development',
         entry: path.join(rootFolder, 'src/renderer/index.tsx'),
-        target: ['web', 'electron-renderer'],
+        target: ['web'],
         output: {
-            path: path.join(rootFolder, 'dist/renderer'),
-            filename: 'renderer.js',
+            path: path.join(rootFolder, 'dist'),
+            filename: 'index.js',
             library: {
                 type: 'umd',
             },
@@ -87,13 +75,11 @@ module.exports = () => {
         devtool: isProduction ? 'source-map' : 'inline-source-map',
         devServer: {
             static: {
-                directory: path.join(rootFolder, 'dist/renderer'),
+                directory: path.join(rootFolder, 'dist'),
             },
             port: port,
             compress: true,
             hot: true,
-            onBeforeSetupMiddleware: with_main ? onBeforeSetupMiddleware : () => {
-            },
         }
     }
 }

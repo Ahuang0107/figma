@@ -10,7 +10,7 @@ const sk = {} as {
     CanvasKit: CanvasKit;
 };
 
-const CanvasKitPromised = CanvasKitInit()
+export const CanvasKitPromised = CanvasKitInit()
     .then((CanvasKit: CanvasKitInitFn.CanvasKit) => {
         sk.CanvasKit = CanvasKit;
         (window as any).CanvasKit = CanvasKit;
