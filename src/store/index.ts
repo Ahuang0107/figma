@@ -1,7 +1,9 @@
 import {themes} from "./Themes";
+import {tools} from "./Tools";
 
 const stores = {
-    themes
+    themes,
+    tools,
 }
 
 export default stores

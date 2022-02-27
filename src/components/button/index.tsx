@@ -2,40 +2,61 @@ import * as React from "react";
 import {Icon, Icons} from "../icon";
 import "./style.scss";
 
-export interface ButtonProps {
-    multiIcon?: Icons,
-    icon?: Icons,
-
-    onClick?(e: React.MouseEvent<HTMLDivElement, MouseEvent>): void;
+export interface ButtonProps extends WithFoldButtonProps {
+    withFold: boolean,
 }
 
 export class Button extends React.Component<ButtonProps> {
-    isActive: boolean = false;
 
     constructor(props: ButtonProps) {
         super(props);
     }
 
     render(): JSX.Element {
-        let button: JSX.Element = <></>
-        if (this.props.multiIcon) {
-            button = <div className="tool-multi-button">
-                <span className="svg-end-button" onClick={this.props.onClick}>
-                    <Icon type={this.props.multiIcon}/>
-                </span>
-                <span className="unfold-button">
-                    <Icon type={"UnfoldIcon"}/>
-                </span>
-            </div>
-        } else if (this.props.icon) {
-            button = <div className="tool-button">
-                <span className="svg-center-button" onClick={this.props.onClick}>
-                    <Icon type={this.props.icon}/>
-                </span>
-            </div>
-        }
         return (
-            button
+            this.props.withFold ?
+                <ButtonWithFold icon={this.props.icon}
+                                isActive={this.props.isActive}
+                                onClick={this.props.onClick}
+                                onFoldClick={this.props.onFoldClick}/> :
+                <ButtonWithoutFold icon={this.props.icon}
+                                   isActive={this.props.isActive}
+                                   onClick={this.props.onClick}/>
         )
     }
 }
+
+interface WithFoldButtonProps extends BaseButtonProps {
+    onFoldClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+}
+
+const ButtonWithFold = (props: WithFoldButtonProps) => {
+    return (
+        <div className={`tool-multi-button ${props.isActive ? "tool-button-active" : ""}`}>
+            <span className="svg-end-button" onClick={props.onClick}>
+                <Icon type={props.icon}/>
+            </span>
+            <span className="unfold-button" onClick={props.onFoldClick}>
+                <Icon type={"UnfoldIcon"}/>
+            </span>
+        </div>
+    )
+}
+
+interface BaseButtonProps {
+    icon?: Icons,
+    isActive?: boolean,
+
+    onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+}
+
+const ButtonWithoutFold = (props: BaseButtonProps) => {
+    return (
+        <div className={`tool-button ${props.isActive ? "tool-button-active" : ""}`}>
+            <span className="svg-center-button" onClick={props.onClick}>
+                <Icon type={props.icon}/>
+            </span>
+        </div>
+    )
+}
+

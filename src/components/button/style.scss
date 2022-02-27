@@ -23,6 +23,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
+
+    transition: padding-top .15s;
+
+    &:hover {
+      padding-top: 8px;
+    }
   }
 }
 
@@ -41,5 +47,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+}
+
+.tool-button-active {
+  background-color: #18a0fb;
+
+  &:hover {
+    background-color: #18a0fb;
   }
 }
