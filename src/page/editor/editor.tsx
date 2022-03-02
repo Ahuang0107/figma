@@ -5,6 +5,7 @@ import "./style.scss";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState, select} from "../../store";
 import {MenusConst} from "../../constants/menus-const";
+import {Canvas} from "../../components/editor";
 
 export function Editor() {
     const theme = useSelector(((state: RootState) => state.themeSelector))
@@ -37,7 +38,7 @@ export function Editor() {
             <div className="editor-edit-panel">
                 <div className="layout-manager-panel"></div>
                 <div className="canvas-panel">
-                    {/*<Canvas/>*/}
+                    <Canvas/>
                 </div>
                 <div className="property-panel"></div>
             </div>
