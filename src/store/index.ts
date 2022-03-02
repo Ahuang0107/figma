@@ -1,9 +1,14 @@
-import {themes} from "./Themes";
-import {tools} from "./Tools";
+import {configureStore} from '@reduxjs/toolkit';
+import {toolSlice} from "./tool";
+import {themeSlice} from "./theme";
 
-const stores = {
-    themes,
-    tools,
-}
+export const store = configureStore({
+    reducer: {
+        themeSelector: themeSlice.reducer,
+        toolSelector: toolSlice.reducer
+    }
+})
 
-export default stores
+export const {select} = toolSlice.actions
+
+export type RootState = ReturnType<typeof store.getState>

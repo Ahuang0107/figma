@@ -1,13 +1,15 @@
 import * as React from "react";
 import {render} from "react-dom";
-import App from "./page/app";
-import {Provider} from "mobx-react";
-import stores from "./store";
+import {Editor} from "./page";
 import "./style.scss";
+import {Provider} from "react-redux";
+import {store} from "./store";
 
 render(
-    <Provider {...stores}>
-        <App/>
-    </Provider>,
+    <React.StrictMode>
+        <Provider store={store}>
+            <Editor/>
+        </Provider>
+    </React.StrictMode>,
     document.getElementById("react-page")
 )
