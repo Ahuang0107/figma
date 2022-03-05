@@ -3,13 +3,23 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development webpack-dev-server --config config/webpack.config.js",
     "dev": "cross-env NODE_ENV=development webpack --config config/webpack.config.js",
-    "build": "cross-env NODE_ENV=production webpack --config config/webpack.config.js"
+    "build": "cross-env NODE_ENV=production webpack --config config/webpack.config.js",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@storybook/addon-actions": "^6.4.19",
+    "@storybook/addon-essentials": "^6.4.19",
+    "@storybook/addon-interactions": "^6.4.19",
+    "@storybook/addon-links": "^6.4.19",
+    "@storybook/react": "^6.4.19",
+    "@storybook/testing-library": "^0.0.9",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "@types/react-redux": "^7.1.23",
     "copy-webpack-plugin": "^10.2.4",
+    "babel-loader": "^8.2.3",
     "cross-env": "^7.0.3",
     "css-loader": "^6.5.1",
     "file-loader": "^6.2.0",
