@@ -1,0 +1,85 @@
+{
+  "id": "1",
+  "name": "page01",
+  "layers": [
+    {
+      "id": "10",
+      "type": "FRAME",
+      "name": "Frame 1",
+      "subLayers": [
+        {
+          "id": "11",
+          "type": "GROUP",
+          "name": "Group 1",
+          "subLayers": [
+            {
+              "id": "12",
+              "type": "RECTANGLE",
+              "name": "Rectangle 1"
+            }
+          ]
+        },
+        {
+          "id": "13",
+          "type": "GROUP",
+          "name": "Group 2",
+          "subLayers": [
+            {
+              "id": "14",
+              "type": "RECTANGLE",
+              "name": "Rectangle 2"
+            },
+            {
+              "id": "15",
+              "type": "RECTANGLE",
+              "name": "Rectangle 3"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "16",
+      "type": "FRAME",
+      "name": "Frame 1",
+      "subLayers": [
+        {
+          "id": "17",
+          "type": "GROUP",
+          "name": "Group 3",
+          "subLayers": [
+            {
+              "id": "18",
+              "type": "RECTANGLE",
+              "name": "Rectangle 4"
+            },
+            {
+              "id": "19",
+              "type": "GROUP",
+              "name": "Group 4",
+              "subLayers": [
+                {
+                  "id": "20",
+                  "type": "GROUP",
+                  "name": "Group 4",
+                  "subLayers": [
+                    {
+                      "id": "22",
+                      "type": "RECTANGLE",
+                      "name": "Rectangle 6"
+                    }
+                  ]
+                },
+                {
+                  "id": "21",
+                  "type": "RECTANGLE",
+                  "name": "Rectangle 5"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

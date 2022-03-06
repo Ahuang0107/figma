@@ -8,9 +8,6 @@ import {HandIcon} from "./icons/HandIcon";
 import {CommentIcon} from "./icons/CommentIcon";
 import * as React from "react";
 
-export {ExpandIcon} from "./icons/ExpandIcon";
-export {FrameThumbnailIcon} from "./icons/FrameThumbnailIcon";
-
 export type Icons =
     | "MoveIcon"
     | "UnfoldIcon"

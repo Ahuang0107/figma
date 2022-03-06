@@ -1,4 +1,5 @@
 const http = require('http')
+const pageData = require('./data/page.json')
 
 const hostname = 'localhost'
 const port = 3000
@@ -27,63 +28,7 @@ const server = http.createServer((req, res) => {
                     console.log("accept page request")
                     res.statusCode = 200
                     res.setHeader('Content-Type', 'application/json')
-                    const data = JSON.stringify({
-                        id: "1",
-                        name: "page-01",
-                        layers: [
-                            {
-                                id: "10",
-                                type: "RECTANGLE",
-                                name: "rectangle",
-                            },
-                            {
-                                id: "20",
-                                type: "RECTANGLE",
-                                name: "rectangle",
-                            },
-                            {
-                                id: "30",
-                                type: "GROUP",
-                                name: "group",
-                                subLayers: [
-                                    {
-                                        id: "40",
-                                        type: "RECTANGLE",
-                                        name: "rectangle",
-                                        subLayers: [
-                                            {
-                                                id: "60",
-                                                type: "RECTANGLE",
-                                                name: "rectangle",
-                                            },
-                                            {
-                                                id: "70",
-                                                type: "RECTANGLE",
-                                                name: "rectangle",
-                                                subLayers: [
-                                                    {
-                                                        id: "80",
-                                                        type: "RECTANGLE",
-                                                        name: "rectangle",
-                                                    },
-                                                    {
-                                                        id: "90",
-                                                        type: "RECTANGLE",
-                                                        name: "rectangle",
-                                                    },
-                                                ]
-                                            },
-                                        ]
-                                    },
-                                    {
-                                        id: "50",
-                                        type: "RECTANGLE",
-                                        name: "rectangle",
-                                    },
-                                ]
-                            },
-                        ]
-                    })
+                    const data = JSON.stringify(pageData)
                     res.end(data)
                     break
                 }

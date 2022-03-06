@@ -6,6 +6,7 @@ export interface Layer {
 }
 
 export enum LayerType {
-    RECTANGLE,
-    GROUP,
+    FRAME = "FRAME",
+    GROUP = "GROUP",
+    RECTANGLE = "RECTANGLE",
 }
