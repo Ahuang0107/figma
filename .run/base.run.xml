@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="base" type="HttpClient.HttpRequestRunConfigurationType"
+                   factoryName="HTTP Request" path="$PROJECT_DIR$/server/http/base.http" index="2"
+                   requestIdentifier="Get hello world!#2" runType="Run single request">
+        <method v="2"/>
+    </configuration>
+</component>

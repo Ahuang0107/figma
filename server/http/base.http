@@ -1,0 +1,7 @@
+### Get hello world!
+GET /
+Host: {{host}}:{{port}}
+
+### Get hello world!
+GET /page/1
+Host: {{host}}:{{port}}
