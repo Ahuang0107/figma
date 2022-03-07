@@ -1,28 +1,31 @@
 import * as React from "react";
+import {useEffect, useRef, useState} from "react";
 import {initCanvasKitAndFont} from "./utils";
 import {CanvasView} from "./view/canvas-view";
+import axios from "axios";
+import {Page} from "./view/page";
 
-export class Canvas extends React.Component {
-    private readonly myRef: React.RefObject<HTMLCanvasElement>;
-    private skyView: CanvasView;
+export function Canvas() {
+    const canvasRef = useRef<HTMLCanvasElement>()
+    const [skyView, setSkyView] = useState<CanvasView>()
+    const [pages, setPages] = useState<Page[]>([])
 
-    constructor(props) {
-        super(props);
-        this.myRef = React.createRef();
-    }
+    useEffect(() => {
+        async function fetchData() {
+            return await axios.get("http://localhost:3000/page/1").then(res => res.data)
+        }
 
-    componentDidMount() {
-        initCanvasKitAndFont().then(() => {
-            this.skyView = new CanvasView(this.myRef.current);
+        Promise.all([initCanvasKitAndFont(), fetchData()]).then(([, data]) => {
+            setSkyView(new CanvasView(canvasRef.current))
+            setPages(data)
         })
+
         window.addEventListener("resize", () => {
-            this.skyView.reSize();
+            skyView.reSize();
         })
-    }
+    }, [])
 
-    render(): JSX.Element {
-        return (
-            <canvas ref={this.myRef} style={{position: "absolute", userSelect: "none"}}/>
-        )
-    }
+    return (
+        <canvas ref={canvasRef} style={{position: "absolute", userSelect: "none"}}/>
+    )
 }

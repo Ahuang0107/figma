@@ -48,6 +48,7 @@ export class CanvasView {
         this.initSchedule();
 
         this.mockData();
+        console.log(this.pages)
     }
 
     mockData() {
