@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Skia Canvas Kit Init Usage</title>
+</head>
+<body>
+<canvas height=400 id=foo style="outline:black 1px solid" width=400></canvas>
+
+<script src="https://unpkg.com/canvaskit-wasm@0.19.0/bin/canvaskit.js"
+        type="text/javascript"></script>
+<script type="text/javascript">
+    const ckLoaded = CanvasKitInit({
+        locateFile: (file) => 'https://unpkg.com/canvaskit-wasm@0.19.0/bin/' + file
+    });
+    ckLoaded.then((CanvasKit) => {
+        const surface = CanvasKit.MakeCanvasSurface('foo');
+        const canvas = surface.getCanvas();
+
+        // onceDraw方法在绘制之前之后分别会调用save和restore方法，确保绘制期间对画布的变化只影响当前绘制，不影响之后的绘制
+        onceDraw(canvas, () => {
+            canvas.translate(10, 10)
+
+            const path = new CanvasKit.Path()
+            path.moveTo(0, 0)
+            path.addRect(CanvasKit.LTRBRect(0, 0, 200, 200))
+
+            const paint = new CanvasKit.Paint()
+            paint.setColor(CanvasKit.Color4f(0.9, 0, 0, 1.0))
+            paint.setStyle(CanvasKit.PaintStyle.Fill)
+
+            canvas.drawPath(path, paint)
+        })
+
+        onceDraw(canvas, () => {
+            const path2 = new CanvasKit.Path()
+            path2.moveTo(0, 0)
+            path2.addRect(CanvasKit.LTRBRect(200, 200, 400, 400))
+
+            const paint2 = new CanvasKit.Paint()
+            paint2.setColor(CanvasKit.Color4f(1, 0.5, 0, 1.0))
+            paint2.setStyle(CanvasKit.PaintStyle.Fill)
+
+            canvas.drawPath(path2, paint2)
+        })
+
+        surface.flush()
+    });
+
+    function onceDraw(canvas, action) {
+        canvas.save()
+        action()
+        canvas.restore()
+    }
+</script>
+</body>
+</html>
