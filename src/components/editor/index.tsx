@@ -1,31 +1,34 @@
 import * as React from "react";
 import {useEffect, useRef, useState} from "react";
-import {initCanvasKitAndFont} from "./utils";
-import {CanvasView} from "./view/canvas-view";
-import axios from "axios";
-import {Page} from "./view/page";
+import {SkyView} from "./view/demo/SkyView";
+import {SkyModel} from "./view/demo/SkyModel";
+import {CanvasKitPromised} from "./view/demo/CanvasKit";
+import JSZip from "jszip";
 
 export function Canvas() {
-    const canvasRef = useRef<HTMLCanvasElement>()
-    const [skyView, setSkyView] = useState<CanvasView>()
-    const [pages, setPages] = useState<Page[]>([])
+    const foreignRef = useRef<HTMLDivElement>()
+    const [skyView, setSkyView] = useState<SkyView>()
 
     useEffect(() => {
-        async function fetchData() {
-            return await axios.get("http://localhost:3000/page/1").then(res => res.data)
+        async function fetchData(): Promise<ArrayBuffer> {
+            return await fetch("http://localhost:3000/docs/test.sketch").then(res => res.arrayBuffer())
         }
 
-        Promise.all([initCanvasKitAndFont(), fetchData()]).then(([, data]) => {
-            setSkyView(new CanvasView(canvasRef.current))
-            setPages(data)
+        Promise.all([CanvasKitPromised, fetchData()]).then(async ([, arrayBuffer]) => {
+            let zipFile = await JSZip.loadAsync(arrayBuffer)
+
+            const model = new SkyModel()
+            await model.readZipFile(zipFile)
+            console.log(model)
+            SkyView.create(model, foreignRef.current).then(skyView => setSkyView(skyView))
         })
 
         window.addEventListener("resize", () => {
-            skyView.reSize();
+            // skyView.reSize();
         })
     }, [])
 
     return (
-        <canvas ref={canvasRef} style={{position: "absolute", userSelect: "none"}}/>
+        <div ref={foreignRef}/>
     )
 }

@@ -1,4 +1,9 @@
-import {CanvasKit, FontMgr, ParagraphBuilder, ParagraphStyle} from "canvaskit-wasm";
+import type {
+    CanvasKit,
+    FontMgr,
+    ParagraphBuilder,
+    ParagraphStyle,
+} from 'canvaskit-wasm';
 import font from "../../../../public/font/en/Montserrat/Montserrat Regular.otf";
 
 const CanvasKitInit = require('canvaskit-wasm/bin/canvaskit.js');
