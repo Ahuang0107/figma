@@ -1,4 +1,4 @@
-import sk, {Color, ParagraphFactory} from "../utils/canvas-kit";
+import sk, {Color} from "../utils/canvas-kit";
 import {BaseLayer} from "./base-layer";
 import {Rect} from "../base/rect";
 import {CanvasView} from "../view/canvas-view";
@@ -17,21 +17,14 @@ export class TextLayer extends BaseLayer {
     render() {
         const {scale} = CanvasView.currentContext;
 
-        const paraStyle = new sk.CanvasKit.ParagraphStyle({
-            textStyle: {
-                color: this.fillColor,
-                fontSize: this.fontSize * scale,
-            }
-        });
-        const builder = ParagraphFactory.createParagraph(paraStyle);
-        builder.addText(this.text);
-        builder.pop();
-        const paragraph = builder.build();
-        // todo issue [Uncaught RuntimeError: abort(undefined).]
-        paragraph.layout(this.rect.width * scale);
         if (this.isHovered) {
 
         }
-        this.ctx.skCanvas.drawParagraph(paragraph, this.rect.x * scale, this.rect.y * scale);
+        const font = new sk.CanvasKit.Font(null, this.fontSize);
+        const fontPaint = new sk.CanvasKit.Paint();
+        fontPaint.setColor(this.fillColor);
+        fontPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
+        fontPaint.setAntiAlias(true);
+        this.ctx.skCanvas.drawText(this.text, this.rect.x * scale, this.rect.y * scale, fontPaint, font);
     }
 }
