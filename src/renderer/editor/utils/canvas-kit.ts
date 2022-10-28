@@ -61,6 +61,7 @@ export function initCanvasKitAndFont() {
 
 export class ParagraphFactory {
     static createParagraph(paraStyle: ParagraphStyle): ParagraphBuilder {
+        console.log("create paragraph builder")
         return sk.CanvasKit.ParagraphBuilder.Make(paraStyle, fontMgr);
     }
 }

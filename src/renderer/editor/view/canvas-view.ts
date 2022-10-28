@@ -37,6 +37,7 @@ export class CanvasView {
     isHoveredLayerId: number | null = null;
 
     constructor(canvasEl: HTMLCanvasElement) {
+        CanvasView.currentContext = this;
         this.canvasEl = canvasEl;
         this.reSize();
 
@@ -45,7 +46,6 @@ export class CanvasView {
         this.skSurface = sk.CanvasKit.MakeOnScreenGLSurface(grCtx, this.canvasEl.width, this.canvasEl.height, sk.CanvasKit.ColorSpace.SRGB)!;
         this.skCanvas = this.skSurface.getCanvas();
 
-        CanvasView.currentContext = this;
         this.initEvent();
         this.blingEvent();
 
@@ -72,11 +72,13 @@ export class CanvasView {
                 const y = index * (cellHeight + cellMargin);
                 // const engage = engageRes.data.find((value) => value.id == booking.engagementCodeId);
 
-                const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
-                const titleLayer = new TextLayer(new Rect(beforeStart, y + fontSize, during, cellHeight), booking.id, fontSize);
-                page.appendLayer(titleLayer);
-                columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
-                page.appendLayer(columnLayer);
+                if (beforeStart <= this.canvasEl.width && y <= this.canvasEl.height && beforeStart >= 0 && y >= 0) {
+                    const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
+                    const titleLayer = new TextLayer(new Rect(beforeStart, y, during, cellHeight), booking.id, fontSize);
+                    page.appendLayer(titleLayer);
+                    columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
+                    page.appendLayer(columnLayer);
+                }
             });
             index++;
         });
