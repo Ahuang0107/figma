@@ -1,4 +1,4 @@
-import {Canvas, Surface} from "canvaskit-wasm";
+import {Canvas, Surface} from "@skeditor/canvaskit-wasm";
 import sk, {Color} from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Page} from "./page";
@@ -6,7 +6,10 @@ import {ShapeLayer, TextLayer} from "../layer";
 import {fromEvent, Observable, Subscription} from "rxjs";
 import {Point} from "../base/point";
 import {DrawFactory, ShapeDrawer} from "../draw/draw-factory";
-import bookings from "../../../assets/data/booking.json";
+import staffRes from "../../../assets/data/staff.json";
+import bookingRes from "../../../assets/data/booking.json";
+
+// import engageRes from "../../../assets/data/engage.json";
 
 export class CanvasView {
     static currentContext: CanvasView;
@@ -37,14 +40,16 @@ export class CanvasView {
         this.canvasEl = canvasEl;
         this.reSize();
 
-        this.skSurface = sk.CanvasKit.MakeCanvasSurface(this.canvasEl)!;
+        const ctx = sk.CanvasKit.GetWebGLContext(this.canvasEl);
+        const grCtx = sk.CanvasKit.MakeGrContext(ctx);
+        this.skSurface = sk.CanvasKit.MakeOnScreenGLSurface(grCtx, this.canvasEl.width, this.canvasEl.height, sk.CanvasKit.ColorSpace.SRGB)!;
         this.skCanvas = this.skSurface.getCanvas();
 
         CanvasView.currentContext = this;
         this.initEvent();
         this.blingEvent();
 
-        this.initSchedule();
+        this.startTick();
 
         this.mockData();
     }
@@ -53,19 +58,28 @@ export class CanvasView {
         const page = new Page();
 
         const origin = 1666659600000;
-        const scaleX = 30;
+        const scaleX = 25;
+        const cellHeight = 20;
+        const cellMargin = 5;
+        const fontSize = 12;
 
-        bookings.forEach((booking, index) => {
-            booking.bookings.forEach((bks) => {
-                const beforeStart = scaleX * (bks.startTime - origin) / 1000 / 60 / 60 / 24;
-                const during = scaleX * (bks.endTime - bks.startTime) / 1000 / 60 / 60 / 24;
-                const columnLayer = new ShapeLayer(new Rect(beforeStart, index * 40, during, 30));
-                const titleLayer = new TextLayer(new Rect(beforeStart + 5, index * 40 + 18, during, 30), "Sales Dynamics", 10);
+        let index = 0;
+        staffRes.data.forEach(staff => {
+            // @ts-ignore
+            bookingRes.data[staff.id]?.forEach(booking => {
+                const beforeStart = scaleX * (booking.startTime - origin) / 1000 / 60 / 60 / 24;
+                const during = scaleX * (booking.endTime - booking.startTime) / 1000 / 60 / 60 / 24;
+                const y = index * (cellHeight + cellMargin);
+                // const engage = engageRes.data.find((value) => value.id == booking.engagementCodeId);
+
+                const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
+                const titleLayer = new TextLayer(new Rect(beforeStart, y + fontSize, during, cellHeight), booking.id, fontSize);
                 page.appendLayer(titleLayer);
                 columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
                 page.appendLayer(columnLayer);
-            })
-        })
+            });
+            index++;
+        });
 
         this.appendPage(page);
         this.currentPage = this.pages[0];
@@ -73,8 +87,10 @@ export class CanvasView {
 
     render() {
         this.skCanvas.clear(Color.GREY);
+        this.skCanvas.save();
         this.currentPage.render();
-        // this.skSurface.flush();
+        this.skCanvas.restore();
+        this.skSurface.flush();
     }
 
     reSize() {
@@ -131,13 +147,12 @@ export class CanvasView {
         })
     }
 
-    // create schedule render task
-    private initSchedule() {
-        const renderSchedule = () => {
-            this.skSurface.requestAnimationFrame(renderSchedule);
+    private startTick() {
+        const handler = () => {
             this.render();
+            setTimeout(handler, 16);
         };
-        this.skSurface.requestAnimationFrame(renderSchedule);
+        setTimeout(handler, 16);
     }
 
     appendPage(page: Page) {

@@ -8,6 +8,7 @@ export class ShapeLayer extends BaseLayer {
 
     constructor(rect: Rect, public cornerRadius: number = 0) {
         super(rect);
+        this.type = "ShapeLayer";
     }
 
     render() {

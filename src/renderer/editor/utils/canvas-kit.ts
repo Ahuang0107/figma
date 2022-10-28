@@ -1,7 +1,8 @@
-import * as CanvasKitInitFn from "canvaskit-wasm";
-import {CanvasKit} from "canvaskit-wasm";
+import * as CanvasKitInitFn from "@skeditor/canvaskit-wasm";
+import {CanvasKit, FontMgr, ParagraphBuilder, ParagraphStyle} from "@skeditor/canvaskit-wasm";
+import "../../../assets/fonts/Roboto-Regular.ttf";
 
-const CanvasKitInit = require('canvaskit-wasm/bin/canvaskit.js');
+const CanvasKitInit = require('@skeditor/canvaskit-wasm/bin/canvaskit.js');
 
 const sk = {} as {
     CanvasKit: CanvasKit;
@@ -12,7 +13,28 @@ export const CanvasKitPromised = CanvasKitInit()
         sk.CanvasKit = CanvasKit;
         (window as any).CanvasKit = CanvasKit;
         return sk.CanvasKit;
-    }) as Promise<CanvasKit>;
+    });
+
+export let fontMgr: FontMgr | undefined;
+
+const URL_Roboto = "./fonts/Roboto-Regular.ttf";
+
+const getFontMgr = () => {
+    if (fontMgr) {
+        return Promise.resolve(fontMgr!);
+    }
+    return Promise.all([URL_Roboto].map((url) =>
+        fetch(url).then((res) => res.arrayBuffer())
+    ))
+        .then((fonts) => {
+            fontMgr = sk.CanvasKit.FontMgr.FromData(...fonts)!;
+
+            // fonts.forEach((_, i) => {
+            //     console.log(">>> Font name: ", fontMgr?.getFamilyName(i));
+            // });
+            return fontMgr!;
+        });
+};
 
 interface Color {
     GREY: Float32Array
@@ -33,8 +55,14 @@ export function initCanvasKitAndFont() {
             PURE_BLACK: sk.CanvasKit.Color(0, 0, 0),
             BLUEISH_BLACK: sk.CanvasKit.Color(20, 20, 44),
         }
-        return
+        return getFontMgr()
     });
+}
+
+export class ParagraphFactory {
+    static createParagraph(paraStyle: ParagraphStyle): ParagraphBuilder {
+        return sk.CanvasKit.ParagraphBuilder.Make(paraStyle, fontMgr);
+    }
 }
 
 export default sk;

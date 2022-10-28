@@ -68,7 +68,7 @@ module.exports = () => {
             }),
             new CopyWebpackPlugin({
                 patterns: [
-                    {from: 'node_modules/canvaskit-wasm/bin/canvaskit.wasm'}
+                    {from: 'node_modules/@skeditor/canvaskit-wasm/bin/canvaskit.wasm'}
                 ]
             }),
         ],

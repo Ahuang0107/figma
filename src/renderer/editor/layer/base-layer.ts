@@ -5,9 +5,12 @@ import sk, {Color} from "../utils/canvas-kit";
 
 let uid = 1;
 
+type LayerType = "TextLayer" | "ShapeLayer";
+
 export abstract class BaseLayer {
     ctx: CanvasView;
     id: number;
+    type: LayerType
 
     protected constructor(public rect: Rect) {
         this.ctx = CanvasView.currentContext;
@@ -40,7 +43,7 @@ export abstract class BaseLayer {
     }
 
     renderHover() {
-        if (this.isHovered) {
+        if (this.isHovered && this.type == "ShapeLayer") {
             const strokePaint = new sk.CanvasKit.Paint();
             strokePaint.setColor(Color.BLUE);
             strokePaint.setStyle(sk.CanvasKit.PaintStyle.Stroke);

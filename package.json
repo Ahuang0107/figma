@@ -30,7 +30,7 @@
     "electron": "^16.0.1",
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
-    "node-sass": "^6.0.1",
+    "sass": "^1.55.0",
     "sass-loader": "^12.3.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
@@ -41,7 +41,7 @@
     "webpack-dev-server": "^4.5.0"
   },
   "dependencies": {
-    "canvaskit-wasm": "^0.37.0",
+    "@skeditor/canvaskit-wasm": "^0.28.1",
     "mobx": "^6.3.7",
     "mobx-react": "^7.2.1",
     "path-browserify": "^1.0.1",

@@ -1,0 +1,43 @@
+{
+  "code": 0,
+  "data": [
+    {
+      "createTime": 1664211478000,
+      "createBy": 0,
+      "updateTime": 1664211478000,
+      "updateBy": 0,
+      "id": "152476",
+      "name": "AUP202212 CCCC Leasing",
+      "code": "23294323",
+      "dummyCode": "",
+      "engCategory": 1,
+      "engType": 1,
+      "serviceLineCode": "01",
+      "subServiceLineCode": "0101",
+      "managerialLocation": "CN01",
+      "legalEntity": "CNL04",
+      "buCode": "CN401",
+      "ouCode": "01070",
+      "muCode": "00262",
+      "smuCode": "0101001",
+      "currency": "CNY",
+      "areaId": 5,
+      "pyEngageCode": "",
+      "globalServiceCode": "231",
+      "openCodeErp": 20.5,
+      "clientCode": "61641547",
+      "clientName": "CCCC Financial Leasing Co Ltd",
+      "picId": 50201,
+      "picName": "Li,Seagull",
+      "eicId": 61259,
+      "eicName": "Luo,Yang",
+      "dataStatus": 1,
+      "dataType": 0,
+      "deleted": false,
+      "startDate": 1663708018000,
+      "closed": false,
+      "match": false,
+      "dummy": false
+    }
+  ]
+}
