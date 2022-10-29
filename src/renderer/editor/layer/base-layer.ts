@@ -20,7 +20,7 @@ export abstract class BaseLayer {
             const position = this.getPosition();
             const isXInCanvas = (e.clientX >= (bounds.left + position.left) && e.clientX <= (bounds.left + position.right));
             const isYInCanvas = (e.clientY >= (bounds.top + position.top) && e.clientY <= (bounds.top + position.bottom));
-            if (isXInCanvas && isYInCanvas) this.ctx.isHoveredLayerId = this.id;
+            if (isXInCanvas && isYInCanvas && this.type == "ShapeLayer") this.ctx.isHoveredLayerId = this.id;
         });
         this.ctx.mouseleaveEvent.subscribe((e) => {
             this.ctx.isHoveredLayerId = null;

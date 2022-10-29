@@ -1,13 +1,9 @@
 import {Canvas, Surface} from "@skeditor/canvaskit-wasm";
 import sk, {Color} from "../utils/canvas-kit";
-import {Rect} from "../base/rect";
 import {Page} from "./page";
-import {ShapeLayer, TextLayer} from "../layer";
 import {fromEvent, Observable, Subscription} from "rxjs";
 import {Point} from "../base/point";
 import {DrawFactory, ShapeDrawer} from "../draw/draw-factory";
-import staffRes from "../../../assets/data/staff.json";
-import bookingRes from "../../../assets/data/booking.json";
 
 // import engageRes from "../../../assets/data/engage.json";
 
@@ -50,47 +46,12 @@ export class CanvasView {
         this.blingEvent();
 
         this.startTick();
-
-        this.mockData();
-    }
-
-    mockData() {
-        const page = new Page();
-
-        const origin = 1666659600000;
-        const scaleX = 25;
-        const cellHeight = 20;
-        const cellMargin = 5;
-        const fontSize = 12;
-
-        let index = 0;
-        staffRes.data.forEach(staff => {
-            // @ts-ignore
-            bookingRes.data[staff.id]?.forEach(booking => {
-                const beforeStart = scaleX * (booking.startTime - origin) / 1000 / 60 / 60 / 24;
-                const during = scaleX * (booking.endTime - booking.startTime) / 1000 / 60 / 60 / 24;
-                const y = index * (cellHeight + cellMargin);
-                // const engage = engageRes.data.find((value) => value.id == booking.engagementCodeId);
-
-                if (beforeStart <= this.canvasEl.width && y <= this.canvasEl.height && beforeStart >= 0 && y >= 0) {
-                    const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
-                    const titleLayer = new TextLayer(new Rect(beforeStart, y, during, cellHeight), booking.id, fontSize);
-                    page.appendLayer(titleLayer);
-                    columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
-                    page.appendLayer(columnLayer);
-                }
-            });
-            index++;
-        });
-
-        this.appendPage(page);
-        this.currentPage = this.pages[0];
     }
 
     render() {
         this.skCanvas.clear(Color.GREY);
         this.skCanvas.save();
-        this.currentPage.render();
+        this.currentPage?.render();
         this.skCanvas.restore();
         this.skSurface.flush();
     }
@@ -159,5 +120,10 @@ export class CanvasView {
 
     appendPage(page: Page) {
         this.pages.push(page);
+    }
+
+    updatePage(index: number, page: Page) {
+        this.pages[index] = page;
+        this.currentPage = this.pages[index];
     }
 }
