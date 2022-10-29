@@ -81,7 +81,7 @@ class TextPainter {
         const {paraArr, baseY} = paintInfo;
         const {skCanvas} = this.layer.ctx;
         paraArr.forEach(([para, y]) => {
-            skCanvas.drawParagraph(para, this.layer.rect.x, y + baseY);
+            skCanvas.drawParagraph(para, this.layer.rect.x + this.layer.ctx.transform.x, y + baseY + this.layer.ctx.transform.y);
         });
     }
 }

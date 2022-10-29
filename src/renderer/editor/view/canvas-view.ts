@@ -21,6 +21,8 @@ export class CanvasView {
 
     scale: number = 1;
 
+    transform: Point = new Point();
+
     mousedownEvent: Observable<MouseEvent>;
     mouseupEvent: Observable<MouseEvent>;
     mousemoveEvent: Observable<MouseEvent>;
@@ -76,10 +78,15 @@ export class CanvasView {
             if (e.ctrlKey) {
                 e.preventDefault();
                 e.stopPropagation();
-                if (e.deltaY > 0) {
-                    this.scale += 0.01;
+                // if (e.deltaY > 0) {
+                //     this.transform.y -= 5;
+                // } else {
+                //     this.transform.y += 5;
+                // }
+                if (e.deltaX > 0) {
+                    this.transform.x -= 5;
                 } else {
-                    this.scale -= 0.01;
+                    this.transform.x += 5;
                 }
             }
         })

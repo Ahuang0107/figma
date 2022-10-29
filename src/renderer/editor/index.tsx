@@ -37,6 +37,8 @@ export class Canvas extends React.Component {
 
         let index = 0;
         staffRes.forEach(staff => {
+            const columnLayer = new ShapeLayer(new Rect(-1000, index * (cellHeight + cellMargin) - 3, 5000, 1));
+            page.appendLayer(columnLayer);
             // @ts-ignore
             bookingRes[staff.id]?.forEach(booking => {
                 const beforeStart = scaleX * (booking.start_time - origin) / 1000 / 60 / 60 / 24;
@@ -44,13 +46,13 @@ export class Canvas extends React.Component {
                 const y = index * (cellHeight + cellMargin);
                 // const engage = engageRes.data.find((value) => value.id == booking.engagementCodeId);
 
-                if (beforeStart <= this.skyView.canvasEl.width && y <= this.skyView.canvasEl.height && beforeStart >= 0 && y >= 0) {
-                    const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
-                    const titleLayer = new TextLayer(new Rect(beforeStart, y, during, cellHeight), booking.id, fontSize);
-                    page.appendLayer(titleLayer);
-                    columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
-                    page.appendLayer(columnLayer);
-                }
+                // if (beforeStart <= this.skyView.canvasEl.width && y <= this.skyView.canvasEl.height && beforeStart >= 0 && y >= 0) {
+                const columnLayer = new ShapeLayer(new Rect(beforeStart, y, during, cellHeight));
+                const titleLayer = new TextLayer(new Rect(beforeStart, y, during, cellHeight), booking.id, fontSize);
+                page.appendLayer(titleLayer);
+                columnLayer.fillColor = sk.CanvasKit.Color(5, 5, 15, 0.37);
+                page.appendLayer(columnLayer);
+                // }
             });
             index++;
         });

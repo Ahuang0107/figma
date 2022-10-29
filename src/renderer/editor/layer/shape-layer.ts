@@ -15,7 +15,7 @@ export class ShapeLayer extends BaseLayer {
         const fillPaint = new sk.CanvasKit.Paint();
         fillPaint.setColor(this.fillColor);
         fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-        const rRect = sk.CanvasKit.RRectXY(this.rect.toRect(), this.cornerRadius, this.cornerRadius);
+        const rRect = sk.CanvasKit.RRectXY(this.rect.withTransform(this.ctx.transform).toRect(), this.cornerRadius, this.cornerRadius);
 
         this.ctx.skCanvas.drawRRect(rRect, fillPaint);
     }

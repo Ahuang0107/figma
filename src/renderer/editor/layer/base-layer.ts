@@ -48,7 +48,7 @@ export abstract class BaseLayer {
             strokePaint.setColor(Color.BLUE);
             strokePaint.setStyle(sk.CanvasKit.PaintStyle.Stroke);
             strokePaint.setStrokeWidth(2);
-            this.ctx.skCanvas.drawRect(this.rect.toRect(), strokePaint);
+            this.ctx.skCanvas.drawRect(this.rect.withTransform(this.ctx.transform).toRect(), strokePaint);
         }
     }
 }
