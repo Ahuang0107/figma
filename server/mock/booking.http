@@ -1,0 +1,7 @@
+### Staffs
+GET /staffs
+Host: {{host}}:{{port}}
+
+### Bookings
+GET /bookings
+Host: {{host}}:{{port}}
