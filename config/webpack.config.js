@@ -80,6 +80,9 @@ module.exports = () => {
             port: port,
             compress: true,
             hot: true,
+        },
+        performance: {
+            hints: false
         }
     }
 }
