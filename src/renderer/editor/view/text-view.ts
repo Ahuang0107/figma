@@ -8,7 +8,7 @@ export class SkyTextView extends SkyBaseView {
         readonly rect: Rect,
         readonly text: string,
         readonly fontSize: number = 10,
-        readonly fillColor: Float32Array = sk.CanvasKit.BLACK
+        readonly fillColor: Float32Array = sk.CanvasKit.WHITE
     ) {
         super();
     }
@@ -52,7 +52,7 @@ class TextPainter {
 
         const lines = text.split(/\r\n|\r|\n/);
         let curY = 0;
-        const paraArr = lines.map((line, idx) => {
+        const paraArr = lines.map((line) => {
             const paraStyle = new sk.CanvasKit.ParagraphStyle({
                 textStyle: {
                     color: this.view.fillColor,

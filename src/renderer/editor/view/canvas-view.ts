@@ -8,6 +8,7 @@ import invariant from "ts-invariant";
 import {SkyPageView} from "./page-view";
 import {SkyTextView} from "./text-view";
 import {bookings, staffs} from "../../../client";
+import {SkyPathView} from "./path-view";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -52,6 +53,8 @@ export class CanvasView extends Disposable {
                     const during = scaleX * (booking.end_time - booking.start_time) / 1000 / 60 / 60 / 24;
                     const y = index * (cellHeight + cellMargin);
                     const pageRect = new Rect(beforeStart, y, during, cellHeight);
+                    const pathView = new SkyPathView(new Rect(beforeStart, y, during, cellHeight));
+                    canvasView.pageView.push(pathView);
                     const textView = new SkyTextView(pageRect, booking.id);
                     canvasView.pageView.push(textView);
                 });
@@ -132,22 +135,6 @@ export class CanvasView extends Disposable {
         this.skCanvas.save();
         this.skCanvas.scale(this.dpi, this.dpi);
         this.pageView?.render();
-        // {
-        //     /* todo 显示线条的示例代码，之后删除 */
-        //     const fillPaint = new sk.CanvasKit.Paint();
-        //     fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
-        //     fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-        //     this.skCanvas.drawLine(50, 50, 100, 50, fillPaint);
-        // }
-        // {
-        //     /* todo 显示矩形的示例代码，有锯齿，实际并不会用到，统一渲染path，之后删除 */
-        //     const fillPaint = new sk.CanvasKit.Paint();
-        //     fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
-        //     fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-        //     const rect = sk.CanvasKit.XYWHRect(50, 100, 50, 20);
-        //     const rRect = sk.CanvasKit.RRectXY(rect, 5, 5);
-        //     this.skCanvas.drawRRect(rRect, fillPaint);
-        // }
         this.skCanvas.restore();
         this.skSurface.flush();
     }
