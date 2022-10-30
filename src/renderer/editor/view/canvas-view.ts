@@ -1,136 +1,160 @@
-import {Canvas, Surface} from "@skeditor/canvaskit-wasm";
-import sk, {Color} from "../utils/canvas-kit";
-import {Page} from "./page";
-import {fromEvent, Observable, Subscription} from "rxjs";
-import {Point} from "../base/point";
-import {DrawFactory, ShapeDrawer} from "../draw/draw-factory";
+import {Canvas, GrDirectContext, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
+import {CanvasKitPromised, defaultFonts, getFontProvider} from "../utils";
+import {BehaviorSubject, debounceTime, Observable} from "rxjs";
+import sk from "../utils/canvas-kit";
+import {Rect} from "../base/rect";
+import {Disposable} from "../base/disposable";
+import invariant from "ts-invariant";
 
-// import engageRes from "../../../assets/data/engage.json";
-
-export class CanvasView {
+export class CanvasView extends Disposable {
     static currentContext: CanvasView;
+    private canvasEl$ = new BehaviorSubject<HTMLCanvasElement | undefined>(undefined);
+    private grContext!: GrDirectContext;
+    private skSurface!: Surface;
+    private skCanvas!: Canvas;
+    private fontProvider!: TypefaceFontProvider;
 
-    canvasEl: HTMLCanvasElement;
+    private dpi = 1;
+    private frame = new Rect();
 
-    skSurface!: Surface;
-    skCanvas!: Canvas;
-
-    pages: Page[] = [];
-
-    currentPage: Page;
-
-    scale: number = 1;
-
-    transform: Point = new Point();
-
-    mousedownEvent: Observable<MouseEvent>;
-    mouseupEvent: Observable<MouseEvent>;
-    mousemoveEvent: Observable<MouseEvent>;
-    mouseleaveEvent: Observable<MouseEvent>;
-    wheelEvent: Observable<WheelEvent>;
-
-    drawing: ShapeDrawer | null = null;
-    drawingSubscription: Subscription | null = null;
-
-    isHoveredLayerId: number | null = null;
-
-    constructor(canvasEl: HTMLCanvasElement) {
+    protected constructor(private foreignEl: HTMLElement) {
+        super();
         CanvasView.currentContext = this;
-        this.canvasEl = canvasEl;
-        this.reSize();
 
-        const ctx = sk.CanvasKit.GetWebGLContext(this.canvasEl);
-        const grCtx = sk.CanvasKit.MakeGrContext(ctx);
-        this.skSurface = sk.CanvasKit.MakeOnScreenGLSurface(grCtx, this.canvasEl.width, this.canvasEl.height, sk.CanvasKit.ColorSpace.SRGB)!;
-        this.skCanvas = this.skSurface.getCanvas();
-
-        this.initEvent();
-        this.blingEvent();
-
+        this.createCanvasEl();
+        this.attachParentNode(foreignEl);
         this.startTick();
     }
 
-    render() {
-        this.skCanvas.clear(Color.GREY);
-        this.skCanvas.save();
-        this.currentPage?.render();
-        this.skCanvas.restore();
-        this.skSurface.flush();
+    static async create(foreignEl: HTMLElement) {
+        await CanvasKitPromised;
+        const canvasView = new CanvasView(foreignEl);
+        canvasView.fontProvider = getFontProvider();
+        return canvasView;
     }
 
-    reSize() {
-        const foreignEl = this.canvasEl.parentElement;
-        const bounds = foreignEl.getBoundingClientRect();
-        this.canvasEl.width = bounds.width;
-        this.canvasEl.height = bounds.height;
+    /**
+     * canvas 应该在 resize 事件触发的时候调整大小
+     * width 和 style.width 都要手动控制以保持一致, 才能不变形。
+     */
+    private createCanvasEl() {
+        const canvasEl = document.createElement('canvas');
+        canvasEl.style.display = 'block';
+        this.grContext = sk.CanvasKit.MakeGrContext(sk.CanvasKit.GetWebGLContext(canvasEl));
+
+        this.canvasEl$.next(canvasEl);
     }
 
-    initEvent() {
-        this.mousedownEvent = fromEvent<MouseEvent>(this.canvasEl, "mousedown");
-        this.mouseupEvent = fromEvent<MouseEvent>(this.canvasEl, "mouseup");
-        this.mousemoveEvent = fromEvent<MouseEvent>(this.canvasEl, "mousemove");
-        this.mouseleaveEvent = fromEvent<MouseEvent>(this.canvasEl, "mouseleave");
-        this.wheelEvent = fromEvent<WheelEvent>(this.canvasEl, "wheel");
-    }
+    private attachParentNode(el: HTMLElement) {
+        const canvasEl = this.canvasEl$.value;
+        invariant(canvasEl && !canvasEl.parentElement, 'Should not attach again!');
+        el.appendChild(canvasEl);
+        this.doResize();
 
-    blingEvent() {
-        this.wheelEvent.subscribe((e) => {
-            if (e.ctrlKey) {
-                e.preventDefault();
-                e.stopPropagation();
-                // if (e.deltaY > 0) {
-                //     this.transform.y -= 5;
-                // } else {
-                //     this.transform.y += 5;
-                // }
-                if (e.deltaX > 0) {
-                    this.transform.x -= 5;
-                } else {
-                    this.transform.x += 5;
-                }
-            }
-        })
-        this.mousedownEvent.subscribe((e) => {
-            this.drawing = DrawFactory.create(new Point(e.offsetX, e.offsetY));
-            this.currentPage.layers.push(this.drawing.toLayer());
-            this.drawingSubscription =
-                this.mousemoveEvent.subscribe((e) => {
-                    this.drawing.updateSize(new Point(e.offsetX, e.offsetY));
-                    this.currentPage.layers.pop();
-                    this.currentPage.layers.push(this.drawing.toLayer());
+        this._disposables.push(
+            new Observable((sub) => {
+                const ro = new ResizeObserver(() => {
+                    sub.next();
                 });
-        });
-        this.mouseupEvent.subscribe((e) => {
-            this.drawing = null;
-            if (this.drawingSubscription) {
-                this.drawingSubscription.unsubscribe();
-            }
-        });
-        this.mouseleaveEvent.subscribe((e) => {
-            if (this.drawing != null) {
-                this.currentPage.layers.pop();
-                this.drawing = null;
-            }
-            if (this.drawingSubscription) {
-                this.drawingSubscription.unsubscribe();
-            }
-        })
+                ro.observe(el);
+                return () => ro.disconnect();
+            })
+                .pipe(debounceTime(200))
+                .subscribe(() => {
+                    this.doResize();
+                })
+        );
+    }
+
+    private doResize(force = false) {
+        const bounds = this.foreignEl.getBoundingClientRect();
+        if (!force && this.frame.width === bounds.width && this.frame.height === bounds.height) {
+            return;
+        }
+
+        const canvasEl = this.canvasEl$.value!;
+
+        this.frame.width = bounds.width;
+        this.frame.height = bounds.height;
+        this.dpi = window.devicePixelRatio;
+
+        canvasEl.style.width = `${bounds.width}px`;
+        canvasEl.style.height = `${bounds.height}px`;
+
+        const canvasWidth = this.frame.width * this.dpi;
+        const canvasHeight = this.frame.height * this.dpi;
+
+        canvasEl.width = canvasWidth;
+        canvasEl.height = canvasHeight;
     }
 
     private startTick() {
         const handler = () => {
+            if (this._disposed) return;
             this.render();
             setTimeout(handler, 16);
         };
         setTimeout(handler, 16);
     }
 
-    appendPage(page: Page) {
-        this.pages.push(page);
+    private render() {
+        this.createSkSurfaceAndCanvas();
+        if (!this.skSurface) return;
+        this.skCanvas.clear(sk.CanvasKit.TRANSPARENT);
+        this.skCanvas.save();
+        this.skCanvas.scale(this.dpi, this.dpi);
+        {
+            /* todo 显示线条的示例代码，之后删除 */
+            const fillPaint = new sk.CanvasKit.Paint();
+            fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
+            fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
+            this.skCanvas.drawLine(50, 50, 100, 50, fillPaint);
+        }
+        {
+            /* todo 显示矩形的示例代码，有锯齿，实际并不会用到，统一渲染path，之后删除 */
+            const fillPaint = new sk.CanvasKit.Paint();
+            fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
+            fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
+            const rect = sk.CanvasKit.XYWHRect(50, 100, 50, 20);
+            const rRect = sk.CanvasKit.RRectXY(rect, 5, 5);
+            this.skCanvas.drawRRect(rRect, fillPaint);
+        }
+        {
+            /* todo 显示文字的示例代码，之后删除 */
+            const paraStyle = new sk.CanvasKit.ParagraphStyle({
+                textStyle: {
+                    color: sk.CanvasKit.BLACK,
+                    fontFamilies: defaultFonts,
+                    fontSize: 10,
+                },
+                ellipsis: "..."
+            });
+            const builder = sk.CanvasKit.ParagraphBuilder.MakeFromFontProvider(paraStyle, this.fontProvider);
+            builder.addText("long paragraph display");
+            const para = builder.build();
+            para.layout(100);
+            builder.delete();
+            this.skCanvas.drawParagraph(para, 150, 50);
+            para.delete();
+        }
+        this.skCanvas.restore();
+        this.skSurface.flush();
     }
 
-    updatePage(index: number, page: Page) {
-        this.pages[index] = page;
-        this.currentPage = this.pages[index];
+    private createSkSurfaceAndCanvas() {
+        this.skSurface?.delete();
+        this.skSurface = undefined;
+        const canvasEl = this.canvasEl$.value!;
+        const surface = sk.CanvasKit.MakeOnScreenGLSurface(
+            this.grContext,
+            canvasEl.width,
+            canvasEl.height,
+            sk.CanvasKit.ColorSpace.SRGB
+        );
+        if (!surface) return;
+        this.skSurface = surface;
+
+        this.skCanvas = this.skSurface.getCanvas();
+        invariant(this.skCanvas, 'Cant create sk canvas');
     }
 }
