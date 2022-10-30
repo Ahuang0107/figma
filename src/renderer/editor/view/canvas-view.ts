@@ -1,21 +1,26 @@
 import {Canvas, GrDirectContext, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
-import {CanvasKitPromised, defaultFonts, getFontProvider} from "../utils";
+import {CanvasKitPromised, getFontProvider} from "../utils";
 import {BehaviorSubject, debounceTime, Observable} from "rxjs";
 import sk from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Disposable} from "../base/disposable";
 import invariant from "ts-invariant";
+import {SkyPageView} from "./page-view";
+import {SkyTextView} from "./text-view";
+import {bookings, staffs} from "../../../client";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
     private canvasEl$ = new BehaviorSubject<HTMLCanvasElement | undefined>(undefined);
     private grContext!: GrDirectContext;
     private skSurface!: Surface;
-    private skCanvas!: Canvas;
-    private fontProvider!: TypefaceFontProvider;
+    skCanvas!: Canvas;
+    fontProvider!: TypefaceFontProvider;
 
     private dpi = 1;
     private frame = new Rect();
+
+    pageView?: SkyPageView = new SkyPageView();
 
     protected constructor(private foreignEl: HTMLElement) {
         super();
@@ -30,6 +35,29 @@ export class CanvasView extends Disposable {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
         canvasView.fontProvider = getFontProvider();
+        {
+            const origin = 1666659600000;
+            const scaleX = 25;
+            const cellHeight = 20;
+            const cellMargin = 5;
+
+            let staffRes = await staffs();
+            let bookingRes = await bookings();
+
+            let index = 0;
+            staffRes.forEach(staff => {
+                // @ts-ignore
+                bookingRes[staff.id]?.forEach(booking => {
+                    const beforeStart = scaleX * (booking.start_time - origin) / 1000 / 60 / 60 / 24;
+                    const during = scaleX * (booking.end_time - booking.start_time) / 1000 / 60 / 60 / 24;
+                    const y = index * (cellHeight + cellMargin);
+                    const pageRect = new Rect(beforeStart, y, during, cellHeight);
+                    const textView = new SkyTextView(pageRect, booking.id);
+                    canvasView.pageView.push(textView);
+                });
+                index++;
+            });
+        }
         return canvasView;
     }
 
@@ -103,40 +131,23 @@ export class CanvasView extends Disposable {
         this.skCanvas.clear(sk.CanvasKit.TRANSPARENT);
         this.skCanvas.save();
         this.skCanvas.scale(this.dpi, this.dpi);
-        {
-            /* todo 显示线条的示例代码，之后删除 */
-            const fillPaint = new sk.CanvasKit.Paint();
-            fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
-            fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-            this.skCanvas.drawLine(50, 50, 100, 50, fillPaint);
-        }
-        {
-            /* todo 显示矩形的示例代码，有锯齿，实际并不会用到，统一渲染path，之后删除 */
-            const fillPaint = new sk.CanvasKit.Paint();
-            fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
-            fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
-            const rect = sk.CanvasKit.XYWHRect(50, 100, 50, 20);
-            const rRect = sk.CanvasKit.RRectXY(rect, 5, 5);
-            this.skCanvas.drawRRect(rRect, fillPaint);
-        }
-        {
-            /* todo 显示文字的示例代码，之后删除 */
-            const paraStyle = new sk.CanvasKit.ParagraphStyle({
-                textStyle: {
-                    color: sk.CanvasKit.BLACK,
-                    fontFamilies: defaultFonts,
-                    fontSize: 10,
-                },
-                ellipsis: "..."
-            });
-            const builder = sk.CanvasKit.ParagraphBuilder.MakeFromFontProvider(paraStyle, this.fontProvider);
-            builder.addText("long paragraph display");
-            const para = builder.build();
-            para.layout(100);
-            builder.delete();
-            this.skCanvas.drawParagraph(para, 150, 50);
-            para.delete();
-        }
+        this.pageView?.render();
+        // {
+        //     /* todo 显示线条的示例代码，之后删除 */
+        //     const fillPaint = new sk.CanvasKit.Paint();
+        //     fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
+        //     fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
+        //     this.skCanvas.drawLine(50, 50, 100, 50, fillPaint);
+        // }
+        // {
+        //     /* todo 显示矩形的示例代码，有锯齿，实际并不会用到，统一渲染path，之后删除 */
+        //     const fillPaint = new sk.CanvasKit.Paint();
+        //     fillPaint.setColor(sk.CanvasKit.Color(0, 0, 0));
+        //     fillPaint.setStyle(sk.CanvasKit.PaintStyle.Fill);
+        //     const rect = sk.CanvasKit.XYWHRect(50, 100, 50, 20);
+        //     const rRect = sk.CanvasKit.RRectXY(rect, 5, 5);
+        //     this.skCanvas.drawRRect(rRect, fillPaint);
+        // }
         this.skCanvas.restore();
         this.skSurface.flush();
     }
