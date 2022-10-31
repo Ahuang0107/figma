@@ -6,7 +6,9 @@ import {Rect} from "../base/rect";
 import {Disposable} from "../base/disposable";
 import invariant from "ts-invariant";
 import {SkyPageView} from "./page-view";
-import {SkyPathView} from "./path-view";
+import {SkyRectView} from "./rect-view";
+import {bookings, staffs} from "../../../client";
+import {SkyTextView} from "./text-view";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -34,8 +36,8 @@ export class CanvasView extends Disposable {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
         canvasView.fontProvider = getFontProvider();
-        /*{
-            /!* todo 这里是mock data的部分，之后再删除
+        {
+            /* todo 这里是mock data的部分，之后再删除
             *   目前需要做的是，一遍把渲染逻辑根据sk-editor完善，
             *   一边考虑如何做到高效的渲染retain的booking界面
             *   比如把左侧的渲染和上方的渲染都分出来，这样就有三个渲染页面
@@ -44,7 +46,7 @@ export class CanvasView extends Disposable {
             *   另外一个问题是，当不显示周末列的功能要如何实现呢？生成画面元素的时候就要把每周末的时间考虑进去，然后算坐标时去掉？
             *   这样看周末和不看周末的视图是不是也要分成两个page
             *   按照月，按照周，按照日的也都要分成不同的page
-            *   那也就是page之外的渲染逻辑 *!/
+            *   那也就是page之外的渲染逻辑 */
             const origin = 1666659600000;
             const scaleX = 25;
             const cellHeight = 20;
@@ -61,16 +63,14 @@ export class CanvasView extends Disposable {
                     const during = scaleX * (booking.end_time - booking.start_time) / 1000 / 60 / 60 / 24;
                     const y = index * (cellHeight + cellMargin);
                     const pageRect = new Rect(beforeStart, y, during, cellHeight);
-                    const pathView = new SkyPathView();
+                    const pathView = new SkyRectView(pageRect, sk.CanvasKit.Color(47, 47, 47), 3);
                     canvasView.pageView.push(pathView);
                     const textView = new SkyTextView(pageRect, booking.id);
                     canvasView.pageView.push(textView);
                 });
                 index++;
             });
-        }*/
-        const pathView = new SkyPathView();
-        canvasView.pageView.push(pathView);
+        }
         return canvasView;
     }
 
