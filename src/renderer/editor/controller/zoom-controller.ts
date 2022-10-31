@@ -18,7 +18,7 @@ export class ZoomController extends Disposable {
         e.preventDefault();
         if (e.ctrlKey || e.metaKey) {
             const scaleMultiply = (100 - 1.5 * this.getScaleDelta(e)) / 100;
-            this.service.onScale(scaleMultiply, new Point(e.offsetX - this.offset.x, e.offsetY - this.offset.x));
+            // this.service.onScale(scaleMultiply, new Point(e.offsetX - this.offset.x, e.offsetY - this.offset.x));
         } else {
             this.service.onOffset(this.getOffsetDelta(e));
         }

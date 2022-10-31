@@ -12,7 +12,7 @@ import {SkyTextView} from "./text-view";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
-    private canvasEl$ = new BehaviorSubject<HTMLCanvasElement | undefined>(undefined);
+    canvasEl$ = new BehaviorSubject<HTMLCanvasElement | undefined>(undefined);
     private grContext!: GrDirectContext;
     private skSurface!: Surface;
     skCanvas!: Canvas;
@@ -20,8 +20,8 @@ export class CanvasView extends Disposable {
 
     private dpi = 1;
     private frame = new Rect();
-
-    pageView?: SkyPageView = new SkyPageView();
+    pageView?: SkyPageView;
+    private dirty = true;
 
     protected constructor(private foreignEl: HTMLElement) {
         super();
@@ -29,13 +29,13 @@ export class CanvasView extends Disposable {
 
         this.createCanvasEl();
         this.attachParentNode(foreignEl);
-        this.startTick();
     }
 
     static async create(foreignEl: HTMLElement) {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
         canvasView.fontProvider = getFontProvider();
+        canvasView.pageView = new SkyPageView();
         {
             /* todo 这里是mock data的部分，之后再删除
             *   目前需要做的是，一遍把渲染逻辑根据sk-editor完善，
@@ -71,6 +71,8 @@ export class CanvasView extends Disposable {
                 index++;
             });
         }
+        console.log("start")
+        canvasView.startTick();
         return canvasView;
     }
 
@@ -138,15 +140,8 @@ export class CanvasView extends Disposable {
         setTimeout(handler, 16);
     }
 
-    private render() {
-        this.createSkSurfaceAndCanvas();
-        if (!this.skSurface) return;
-        this.skCanvas.clear(sk.CanvasKit.TRANSPARENT);
-        this.skCanvas.save();
-        this.skCanvas.scale(this.dpi, this.dpi);
-        this.pageView?.render();
-        this.skCanvas.restore();
-        this.skSurface.flush();
+    markDirty() {
+        this.dirty = true;
     }
 
     private createSkSurfaceAndCanvas() {
@@ -164,5 +159,22 @@ export class CanvasView extends Disposable {
 
         this.skCanvas = this.skSurface.getCanvas();
         invariant(this.skCanvas, 'Cant create sk canvas');
+    }
+
+    private render() {
+        if (!this.dirty) return;
+        this.createSkSurfaceAndCanvas();
+        if (!this.skSurface) return;
+        this.skCanvas.clear(sk.CanvasKit.TRANSPARENT);
+        if (this.pageView) {
+            const start = Date.now();
+            this.skCanvas.save();
+            this.skCanvas.scale(this.dpi, this.dpi);
+            this.pageView?.render();
+            this.skCanvas.restore();
+            this.skSurface.flush();
+            console.log('>>> render costs:', Date.now() - start);
+        }
+        this.dirty = false;
     }
 }
