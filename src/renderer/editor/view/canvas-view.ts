@@ -1,6 +1,6 @@
 import {Canvas, GrDirectContext, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
 import {CanvasKitPromised, getFontProvider} from "../utils";
-import {BehaviorSubject, debounceTime, Observable} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import sk from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
 import {Disposable} from "../base/disposable";
@@ -9,6 +9,8 @@ import {SkyPageView} from "./page-view";
 import {SkyRectView} from "./rect-view";
 import {bookings, staffs} from "../../../client";
 import {SkyTextView} from "./text-view";
+import {PageState} from "./page-state";
+import {debounceTime} from "rxjs/operators";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -17,6 +19,7 @@ export class CanvasView extends Disposable {
     private skSurface!: Surface;
     skCanvas!: Canvas;
     fontProvider!: TypefaceFontProvider;
+    pageState = new PageState();
 
     private dpi = 1;
     private frame = new Rect();

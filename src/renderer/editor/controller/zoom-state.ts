@@ -37,4 +37,8 @@ export class ZoomState implements IZoomListener {
     onOffset(offset: Point): void {
         this._position$.next(this.position.minus(offset));
     }
+
+    setPosition(pt: Point) {
+        this._position$.next(pt);
+    }
 }

@@ -1,9 +1,9 @@
 import {Color, Paint} from "@skeditor/canvaskit-wasm";
-import {SkyBaseView} from "./base-view";
 import sk from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
+import {SkyBaseLayerView} from "./base-layer-view";
 
-export class SkyRectView extends SkyBaseView {
+export class SkyRectView extends SkyBaseLayerView {
     constructor(
         readonly rect: Rect,
         readonly fillColor: Color = sk.CanvasKit.TRANSPARENT,
@@ -21,7 +21,7 @@ export class SkyRectView extends SkyBaseView {
         return this._painter;
     }
 
-    render(): void {
+    _render(): void {
         this.painter.paint();
     }
 }

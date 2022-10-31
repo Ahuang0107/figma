@@ -1,9 +1,9 @@
-import {SkyBaseView} from "./base-view";
 import {Paragraph} from "@skeditor/canvaskit-wasm";
 import {Rect} from "../base/rect";
 import sk, {defaultFonts} from "../utils/canvas-kit";
+import {SkyBaseLayerView} from "./base-layer-view";
 
-export class SkyTextView extends SkyBaseView {
+export class SkyTextView extends SkyBaseLayerView {
     constructor(
         readonly rect: Rect,
         readonly text: string,
@@ -22,7 +22,7 @@ export class SkyTextView extends SkyBaseView {
         return this._painter;
     }
 
-    render(): void {
+    _render(): void {
         this.painter.paint();
     }
 }
