@@ -4,6 +4,7 @@ import {Rect} from "../base/rect";
 import {SkyRectView} from "../view/rect-view";
 import sk from "../utils/canvas-kit";
 import {SkyTextView} from "../view/text-view";
+import {SkyLineView} from "../view/line-view";
 
 export async function testPageView(): Promise<SkyPageView> {
     const pageView = new SkyPageView();
@@ -22,22 +23,37 @@ export async function testPageView(): Promise<SkyPageView> {
     const cellHeight = 20;
     const cellMargin = 5;
 
+    const cellOffsetX = 3;
+    const cellOffsetY = 2;
+
     let staffRes = await staffs();
     let bookingRes = await bookings();
+    const greyColor = sk.CanvasKit.Color(47, 47, 47);
+
+    let start = 1656291600000;
+    while (start < 1662080400000) {
+        const beforeStart = scaleX * (start - origin) / 1000 / 60 / 60 / 24;
+        const lineView = new SkyLineView(new Rect(beforeStart, 0, 0, 2000), greyColor);
+        pageView.push(lineView);
+        start += 604800000 / 7;
+    }
+
 
     let index = 0;
     staffRes.forEach(staff => {
+        const y = index * (cellHeight + cellMargin);
         // @ts-ignore
         bookingRes[staff.id]?.forEach(booking => {
             const beforeStart = scaleX * (booking.start_time - origin) / 1000 / 60 / 60 / 24;
             const during = scaleX * (booking.end_time - booking.start_time) / 1000 / 60 / 60 / 24;
-            const y = index * (cellHeight + cellMargin);
-            const pageRect = new Rect(beforeStart, y, during, cellHeight);
-            const pathView = new SkyRectView(pageRect, sk.CanvasKit.Color(47, 47, 47), 3);
+            const pageRect = new Rect(beforeStart + cellOffsetX, y + cellOffsetY, during, cellHeight);
+            const pathView = new SkyRectView(pageRect, greyColor, 3);
             pageView.push(pathView);
             const textView = new SkyTextView(pageRect, booking.id);
             pageView.push(textView);
         });
+        const lineView = new SkyLineView(new Rect(0, y, 2000, 0), greyColor);
+        pageView.push(lineView);
         index++;
     });
     return pageView
