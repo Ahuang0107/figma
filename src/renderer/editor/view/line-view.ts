@@ -8,7 +8,7 @@ export class SkyLineView extends SkyBaseLayerView {
         readonly rect: Rect,
         readonly fillColor: Color = sk.CanvasKit.TRANSPARENT
     ) {
-        super();
+        super(rect);
     }
 
     _painter?: LintPainter;

@@ -9,6 +9,8 @@ import {SkyPageView} from "./page-view";
 import {PageState} from "./page-state";
 import {debounceTime} from "rxjs/operators";
 import {initCellView} from "../page/init-cell-page";
+import {SkyBaseLayerView} from "./base-layer-view";
+import {PointerController} from "../controller/poniter-controller";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -17,10 +19,10 @@ export class CanvasView extends Disposable {
     private skSurface!: Surface;
     skCanvas!: Canvas;
     fontProvider!: TypefaceFontProvider;
-    pageState = new PageState();
 
     private dpi = 1;
     private frame = new Rect();
+    pageState = new PageState();
     pageView?: SkyPageView;
     private dirty = true;
 
@@ -30,6 +32,14 @@ export class CanvasView extends Disposable {
 
         this.createCanvasEl();
         this.attachParentNode(foreignEl);
+
+        this._disposables.push(
+            this.pageState.changed.subscribe(() => {
+                this.markDirty();
+            }),
+
+            new PointerController(this)
+        );
     }
 
     static async create(foreignEl: HTMLElement) {
@@ -141,5 +151,21 @@ export class CanvasView extends Disposable {
             console.log('>>> render costs:', Date.now() - start);
         }
         this.dirty = false;
+    }
+
+    selectLayer(layer: SkyBaseLayerView | undefined) {
+        if (layer) {
+            this.pageState.selectLayer(layer);
+        } else {
+            this.pageState.selectLayer(undefined);
+        }
+    }
+
+    hoverLayer(layer: SkyBaseLayerView | undefined) {
+        if (layer) {
+            this.pageState.hoverLayer(layer);
+        } else {
+            this.pageState.hoverLayer(undefined);
+        }
     }
 }

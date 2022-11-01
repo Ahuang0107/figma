@@ -10,7 +10,7 @@ export class SkyTextView extends SkyBaseLayerView {
         readonly fontSize: number = 10,
         readonly fillColor: Float32Array = sk.CanvasKit.WHITE
     ) {
-        super();
+        super(rect);
     }
 
     _painter?: TextPainter;

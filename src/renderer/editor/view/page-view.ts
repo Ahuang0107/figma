@@ -1,24 +1,27 @@
-import {SkyBaseView} from "./base-view";
 import {ZoomState} from "../controller/zoom-state";
 import {ZoomController} from "../controller/zoom-controller";
 import {SkyBaseLayerView} from "./base-layer-view";
+import {Rect} from "../base/rect";
+import {Transform} from "../base/transform";
 
 export class SkyPageView extends SkyBaseLayerView {
     zoomState: ZoomState;
     controller!: ZoomController;
-    children: SkyBaseView[] = [];
+    transform = new Transform();
+    children: SkyBaseLayerView[] = [];
 
     constructor() {
-        super();
+        super(new Rect());
         this.zoomState = new ZoomState();
         this.initController();
     }
 
-    push<T extends SkyBaseView>(view: T) {
+    push<T extends SkyBaseLayerView>(view: T) {
         this.children.push(view)
     }
 
     _render() {
+        this.applyTransform();
         this.children.forEach(child => {
             child.render();
         })
@@ -31,6 +34,13 @@ export class SkyPageView extends SkyBaseLayerView {
         this.transform.updateLocalTransform();
     }
 
+    protected applyTransform() {
+        const {skCanvas} = this.ctx;
+        this.updateTransform();
+        const arr = this.transform.localTransform.toArray(false);
+        skCanvas.concat(arr);
+    }
+
     private initController() {
         // todo, add to dispose
         this.ctx.canvasEl$.subscribe((el) => {
@@ -38,7 +48,7 @@ export class SkyPageView extends SkyBaseLayerView {
         });
 
         this.zoomState.changed$.subscribe(() => {
-            console.log("zoom state change: ", this.zoomState.position)
+            this.ctx.pageState.reset();
             this.ctx.markDirty();
         });
     }

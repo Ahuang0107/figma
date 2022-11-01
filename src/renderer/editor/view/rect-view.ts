@@ -4,12 +4,14 @@ import {Rect} from "../base/rect";
 import {SkyBaseLayerView} from "./base-layer-view";
 
 export class SkyRectView extends SkyBaseLayerView {
+    enableHover = true;
+
     constructor(
         readonly rect: Rect,
         readonly fillColor: Color = sk.CanvasKit.TRANSPARENT,
         readonly radius: number = 0
     ) {
-        super();
+        super(rect);
     }
 
     _painter?: RectPainter;
@@ -21,8 +23,21 @@ export class SkyRectView extends SkyBaseLayerView {
         return this._painter;
     }
 
+    _hoverPainter?: RectHoverPainter;
+
+    private get hoverPainter() {
+        if (!this._hoverPainter) {
+            this._hoverPainter = new RectHoverPainter(this);
+        }
+        return this._hoverPainter;
+    }
+
     _render(): void {
-        this.painter.paint();
+        if (this.ctx.pageState.hoverLayerView?.id == this.id) {
+            this.hoverPainter.paint();
+        } else {
+            this.painter.paint();
+        }
     }
 }
 
@@ -49,6 +64,43 @@ export class RectPainter {
         const {rect, fillColor, radius} = this.view;
         const paint = new sk.CanvasKit.Paint();
         paint.setColor(fillColor);
+        paint.setAntiAlias(true);
+        return {
+            rect: rect.toRRectXY(radius, radius),
+            paint,
+        };
+    }
+
+    private paintWith(paintInfo: RectPaintInfo | undefined) {
+        if (!paintInfo) return;
+        const {rect, paint} = paintInfo;
+        const {skCanvas} = this.view.ctx;
+
+        skCanvas.drawRRect(rect, paint);
+    }
+}
+
+export class RectHoverPainter {
+    constructor(private view: SkyRectView) {
+    }
+
+    private _cachePaintInfo?: RectPaintInfo;
+
+    get cachePaintInfo() {
+        if (!this._cachePaintInfo) {
+            this._cachePaintInfo = this.buildPaintInfo();
+        }
+        return this._cachePaintInfo;
+    }
+
+    paint() {
+        this.paintWith(this.cachePaintInfo);
+    }
+
+    private buildPaintInfo(): RectPaintInfo {
+        const {rect, radius} = this.view;
+        const paint = new sk.CanvasKit.Paint();
+        paint.setColor(sk.CanvasKit.Color(0, 137, 167));
         paint.setAntiAlias(true);
         return {
             rect: rect.toRRectXY(radius, radius),

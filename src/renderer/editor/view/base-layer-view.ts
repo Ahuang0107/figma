@@ -1,27 +1,25 @@
 import {SkyBaseView} from "./base-view";
-import {Transform} from "../base/transform";
+import {Point} from "../base/point";
+import {Rect} from "../base/rect";
 
 export abstract class SkyBaseLayerView extends SkyBaseView {
-    transform = new Transform();
+    enableHover = false;
+
+    protected constructor(public frame: Rect) {
+        super();
+    }
 
     render() {
         const {skCanvas} = this.ctx;
         skCanvas.save();
-        this.applyTransform();
         this._render();
         skCanvas.restore();
     }
 
     abstract _render(): void;
 
-    updateTransform() {
-        this.transform.updateLocalTransform();
-    }
-
-    protected applyTransform() {
-        const {skCanvas} = this.ctx;
-        this.updateTransform();
-        const arr = this.transform.localTransform.toArray(false);
-        skCanvas.concat(arr);
+    containsPoint(pt: Point) {
+        const offset = this.ctx.pageView.transform.position;
+        return this.frame.containsPoint(pt.minus(new Point(offset.x, offset.y)));
     }
 }
