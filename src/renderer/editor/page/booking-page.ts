@@ -1,13 +1,11 @@
 import {SkyPageView} from "../view/page-view";
-import {bookings, staffs} from "../../../client";
+import {bookings, login, staffs} from "../../../client";
 import {Rect} from "../base/rect";
 import {SkyRectView} from "../view/rect-view";
 import sk from "../utils/canvas-kit";
 import {SkyTextView} from "../view/text-view";
-import {SkyLineView} from "../view/line-view";
 
-export async function testPageView(): Promise<SkyPageView> {
-    const pageView = new SkyPageView();
+export async function initPageView(pageView: SkyPageView) {
     /* todo 这里是mock data的部分，之后再删除
             *   目前需要做的是，一遍把渲染逻辑根据sk-editor完善，
             *   一边考虑如何做到高效的渲染retain的booking界面
@@ -18,43 +16,34 @@ export async function testPageView(): Promise<SkyPageView> {
             *   这样看周末和不看周末的视图是不是也要分成两个page
             *   按照月，按照周，按照日的也都要分成不同的page
             *   那也就是page之外的渲染逻辑 */
-    const origin = 1656291600000;
+    /*2022-10-31作为显示原点*/
+    const origin = 1666659600000;
     const scaleX = 25;
     const cellHeight = 20;
     const cellMargin = 5;
 
     const cellOffsetX = 3;
     const cellOffsetY = 2;
+    await login();
 
-    let staffRes = await staffs();
-    let bookingRes = await bookings();
+    let staffRes = await staffs(0, 40);
+    let bookingRes = await bookings(staffRes.map(v => v.id).join(), 1664121600000, 1672502400000);
     const greyColor = sk.CanvasKit.Color(47, 47, 47);
-
-    let start = 1656291600000;
-    while (start < 1662080400000) {
-        const beforeStart = scaleX * (start - origin) / 1000 / 60 / 60 / 24;
-        const lineView = new SkyLineView(new Rect(beforeStart, 0, 0, 2000), greyColor);
-        pageView.push(lineView);
-        start += 604800000 / 7;
-    }
-
 
     let index = 0;
     staffRes.forEach(staff => {
         const y = index * (cellHeight + cellMargin);
         // @ts-ignore
         bookingRes[staff.id]?.forEach(booking => {
-            const beforeStart = scaleX * (booking.start_time - origin) / 1000 / 60 / 60 / 24;
-            const during = scaleX * (booking.end_time - booking.start_time) / 1000 / 60 / 60 / 24;
+            const beforeStart = scaleX * (booking.startTime - origin) / 1000 / 60 / 60 / 24;
+            const during = scaleX * (booking.endTime - booking.startTime) / 1000 / 60 / 60 / 24;
             const pageRect = new Rect(beforeStart + cellOffsetX, y + cellOffsetY, during, cellHeight);
             const pathView = new SkyRectView(pageRect, greyColor, 3);
             pageView.push(pathView);
             const textView = new SkyTextView(pageRect, booking.id);
             pageView.push(textView);
         });
-        const lineView = new SkyLineView(new Rect(0, y, 2000, 0), greyColor);
-        pageView.push(lineView);
         index++;
     });
-    return pageView
+    pageView.ctx.markDirty();
 }

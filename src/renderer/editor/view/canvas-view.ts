@@ -8,7 +8,7 @@ import invariant from "ts-invariant";
 import {SkyPageView} from "./page-view";
 import {PageState} from "./page-state";
 import {debounceTime} from "rxjs/operators";
-import {testPageView} from "../page/test-page";
+import {initCellView} from "../page/init-cell-page";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -36,7 +36,7 @@ export class CanvasView extends Disposable {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
         canvasView.fontProvider = getFontProvider();
-        canvasView.pageView = await testPageView();
+        canvasView.pageView = await initCellView();
         canvasView.startTick();
         return canvasView;
     }

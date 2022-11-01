@@ -1,63 +1,120 @@
+export async function login(): Promise<any> {
+    const formData = new FormData();
+    formData.append('username', 'smarthubdev');
+    formData.append('password', 'smarthub@1234');
+    const startTime = Date.now();
+    const result = await fetch("http://192.168.207.17/server/endpoint/admin_user/login", {
+        body: formData,
+        method: "post",
+        headers: {
+            "test": "7EBZfzzrPWHBmXJtl#86LDs6varwXlYF"
+        }
+    }).then((res) => res.json()).then((res) => res.data);
+    console.log("login response time: ", Date.now() - startTime);
+    return result
+}
+
 interface Staff {
-    "create_time": string,
-    "create_by": number,
-    "update_time": number,
-    "update_by": number,
+    "createTime": string,
+    "createBy": number,
+    "updateTime": number,
+    "updateBy": number,
     "id": string,
     "gui": string,
     "gpn": string,
-    "user_name": string,
-    "user_type": number,
+    "userName": string,
+    "userType": number,
     "name": string,
-    "local_name": string,
-    "rank_code": string,
-    "employee_type": number,
-    "service_line_code": string,
-    "sub_service_line_code": string,
-    "managerial_country": string,
-    "bu_code": string,
-    "ou_code": string,
-    "mu_code": string,
-    "smu_code": string,
+    "localName": string,
+    "rankCode": string,
+    "employeeType": number,
+    "serviceLineCode": string,
+    "subServiceLineCode": string,
+    "managerialCountry": string,
+    "buCode": string,
+    "ouCode": string,
+    "muCode": string,
+    "smuCode": string,
     "currency": string,
-    "counselor_gui": string,
-    "mobile_phone": string,
+    "counselorGui": string,
+    "mobilePhone": string,
     "gender": number,
-    "hire_date": number,
-    "rehire_date": number,
-    "primary_languages": string,
+    "hireDate": number,
+    "rehireDate": number,
+    "primaryLanguages": string,
     "email": string,
     "department": string,
-    "data_status": number,
+    "dataStatus": number,
     "deleted": number,
-    "sub_group1": string,
+    "subGroup1": string,
     "region": string,
-    "legal_entity": string
+    "legalEntity": string
 }
 
-async function staffs(): Promise<Staff[]> {
-    return await fetch("http://127.0.0.1:8080/staffs").then((res) => res.json())
+async function staffs(start: number, size: number): Promise<Staff[]> {
+    const startTime = Date.now();
+    const result = await fetch("http://192.168.207.17/server/endpoint/basic/staff/listByViewConfig", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+            "test": "7EBZfzzrPWHBmXJtl#86LDs6varwXlYF"
+        },
+        body: JSON.stringify({
+            start,
+            size,
+            viewConditionQOS: [{
+                condition: "=",
+                fieldCode: "CN413",
+                fieldName: "bu_code",
+                operation: "and",
+                fieldValue: "EYHMLLP-Hangzhou"
+            }, {
+                condition: "=",
+                fieldCode: "1",
+                fieldName: "data_status",
+                operation: "and",
+                fieldValue: "active"
+            }]
+        })
+    }).then((res) => res.json()).then((res) => res.data);
+    console.log("staff view response time: ", Date.now() - startTime);
+    return result
 }
 
 interface Booking {
-    "create_time": number,
-    "create_by": number,
-    "update_time": number,
-    "update_by": number,
+    "createTime": number,
+    "createBy": number,
+    "updateTime": number,
+    "updateBy": number,
     "id": string,
-    "start_time": number,
-    "end_time": number,
-    "staff_id": string,
-    "engagement_code_id": string,
-    "engagement_type": number,
-    "booking_type": number,
+    "startTime": number,
+    "endTime": number,
+    "staffId": string,
+    "engagementCodeId": string,
+    "engagementType": number,
+    "bookingType": number,
     "ghost": boolean,
     "extension": string,
-    "total_hours": number
+    "totalHours": number
 }
 
-async function bookings(): Promise<{ [key: string]: Booking[] }> {
-    return await fetch("http://127.0.0.1:8080/bookings").then((res) => res.json())
+async function bookings(staffIds: string, startDate: number, endDate: number): Promise<{ [key: string]: Booking[] }> {
+    const startTime = Date.now();
+    const result = await fetch("http://192.168.207.17/server/endpoint/booking/listByViewConfig", {
+        method: "post",
+        headers: {
+            "Content-Type": "application/json",
+            "test": "7EBZfzzrPWHBmXJtl#86LDs6varwXlYF"
+        },
+        body: JSON.stringify({
+            staffIds: staffIds,
+            startDate: startDate,
+            endDate: endDate,
+            viewConditionQOS: []
+        })
+    }).then((res) => res.json()).then((res) => res.data);
+    console.log("booking view response time: ", Date.now() - startTime);
+    return result
 }
 
 export {
