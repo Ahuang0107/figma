@@ -81,7 +81,7 @@ async function staffs(start: number, size: number): Promise<Staff[]> {
     return result
 }
 
-interface Booking {
+export interface Booking {
     "createTime": number,
     "createBy": number,
     "updateTime": number,

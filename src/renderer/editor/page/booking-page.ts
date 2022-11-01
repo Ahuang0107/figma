@@ -1,9 +1,8 @@
 import {SkyPageView} from "../view/page-view";
-import {bookings, login, staffs} from "../../../client";
+import {Booking, bookings, login, staffs} from "../../../client";
 import {Rect} from "../base/rect";
 import {SkyRectView} from "../view/rect-view";
 import sk from "../utils/canvas-kit";
-import {SkyTextView} from "../view/text-view";
 
 export async function initPageView(pageView: SkyPageView) {
     /* todo 这里是mock data的部分，之后再删除
@@ -18,32 +17,44 @@ export async function initPageView(pageView: SkyPageView) {
             *   那也就是page之外的渲染逻辑 */
     /*2022-10-31作为显示原点*/
     const origin = 1666659600000;
-    const scaleX = 25;
+    const cellWidth = 25;
     const cellHeight = 20;
-    const cellMargin = 5;
-
-    const cellOffsetX = 3;
-    const cellOffsetY = 2;
     await login();
 
-    let staffRes = await staffs(0, 40);
-    let bookingRes = await bookings(staffRes.map(v => v.id).join(), 1664121600000, 1672502400000);
-    const greyColor = sk.CanvasKit.Color(47, 47, 47);
+    let staffRes = await staffs(0, 2000);
+    let bookingRes = await bookings(staffRes.map(v => v.id).join(), 1666688400000, 1695632400000);
+    const rtColor = sk.CanvasKit.Color(112, 124, 116);
+    const otColor = sk.CanvasKit.Color(145, 152, 159);
 
-    let index = 0;
+    let y = 0;
     staffRes.forEach(staff => {
-        const y = index * (cellHeight + cellMargin);
-        // @ts-ignore
-        bookingRes[staff.id]?.forEach(booking => {
-            const beforeStart = scaleX * (booking.startTime - origin) / 1000 / 60 / 60 / 24;
-            const during = scaleX * (booking.endTime - booking.startTime) / 1000 / 60 / 60 / 24;
-            const pageRect = new Rect(beforeStart + cellOffsetX, y + cellOffsetY, during, cellHeight);
-            const pathView = new SkyRectView(pageRect, greyColor, 3);
-            pageView.push(pathView);
-            const textView = new SkyTextView(pageRect, booking.id);
-            pageView.push(textView);
+        const bookings = bookingRes[staff.id] ?? [];
+        const typeBookingMap: Map<number, Booking[]> = new Map();
+        bookings.forEach(booking => {
+            if (typeBookingMap.has(booking.bookingType)) {
+                typeBookingMap.get(booking.bookingType).push(booking)
+            } else {
+                typeBookingMap.set(booking.bookingType, [booking])
+            }
         });
-        index++;
+        typeBookingMap.forEach((typeBookings, type) => {
+            let fillColor: Float32Array
+            if (type == 111) {
+                fillColor = rtColor
+            } else {
+                fillColor = otColor
+            }
+            typeBookings.forEach(booking => {
+                const beforeStart = cellWidth * (booking.startTime - origin) / 1000 / 60 / 60 / 24;
+                const during = cellWidth * (booking.endTime - booking.startTime) / 1000 / 60 / 60 / 24;
+                const pageRect = new Rect(beforeStart, y, during, cellHeight);
+                const pathView = new SkyRectView(pageRect, fillColor);
+                pageView.push(pathView);
+                // const textView = new SkyTextView(pageRect, booking.id);
+                // pageView.push(textView);
+            });
+            y += cellHeight;
+        });
     });
     pageView.ctx.markDirty();
 }

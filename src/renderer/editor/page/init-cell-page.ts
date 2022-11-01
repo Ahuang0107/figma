@@ -2,6 +2,8 @@ import {SkyPageView} from "../view/page-view";
 import {Rect} from "../base/rect";
 import sk from "../utils/canvas-kit";
 import {SkyLineView} from "../view/line-view";
+import {SkyRectView} from "../view/rect-view";
+import {TimeStamp, TimeStampConverter} from "../utils/time-stamp";
 
 export async function initCellView(): Promise<SkyPageView> {
     const pageView = new SkyPageView();
@@ -11,22 +13,29 @@ export async function initCellView(): Promise<SkyPageView> {
     const cellHeight = 20;
     const cellMargin = 5;
 
-    const greyColor = sk.CanvasKit.Color(47, 47, 47);
+    const cellBorderColor = sk.CanvasKit.Color(204, 204, 204);
+    const SUNEZUMI = sk.CanvasKit.Color(120, 125, 123);
+
+    const converter = new TimeStampConverter();
 
     /*渲染垂直的单元格边框逻辑*/
-    let start = 1640966400000;/*2022-01-01*/
-    while (start < 1704038400000) {/*2024-01-01*/
-        const beforeStart = scaleX * (start - origin) / 1000 / 60 / 60 / 24;
-        const lineView = new SkyLineView(new Rect(beforeStart, 0, 0, 2000), greyColor);
+    const start = TimeStamp.from(Date.UTC(2022, 0, 1));
+    const end = TimeStamp.from(Date.UTC(2023, 0, 1));
+    start.loop(TimeStamp.DAY_DURING, end, (time) => {
+        const beforeStart = scaleX * (time.milliseconds - origin) / 1000 / 60 / 60 / 24;
+        const lineView = new SkyLineView(new Rect(beforeStart, 0, 0, 2000), cellBorderColor);
         pageView.push(lineView);
-        start += 604800000 / 7;
-    }
+        if ((time.milliseconds - 144000) % 604800000 == 0) {
+            const rectView = new SkyRectView(new Rect(beforeStart, 0, scaleX * 2, 2000), SUNEZUMI, 0, false);
+            pageView.push(rectView);
+        }
+    })
 
     /*渲染水平的单元格边框逻辑*/
     let index = 0;
     while (index < 100) {
         const y = index * (cellHeight + cellMargin);
-        const lineView = new SkyLineView(new Rect(-8000, y, 20000, 0), greyColor);
+        const lineView = new SkyLineView(new Rect(-8000, y, 20000, 0), cellBorderColor);
         pageView.push(lineView);
         index++;
     }

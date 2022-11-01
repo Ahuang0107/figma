@@ -4,12 +4,11 @@ import {Rect} from "../base/rect";
 import {SkyBaseLayerView} from "./base-layer-view";
 
 export class SkyRectView extends SkyBaseLayerView {
-    enableHover = true;
-
     constructor(
         readonly rect: Rect,
         readonly fillColor: Color = sk.CanvasKit.TRANSPARENT,
-        readonly radius: number = 0
+        readonly radius: number = 0,
+        readonly enableHover = true
     ) {
         super(rect);
     }
