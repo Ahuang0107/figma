@@ -117,7 +117,57 @@ async function bookings(staffIds: string, startDate: number, endDate: number): P
     return result
 }
 
+interface Engagement {
+    "createTime": number,
+    "createBy": number,
+    "updateTime": number,
+    "updateBy": number,
+    "id": string,
+    "name": string,
+    "code": string,
+    "dummyCode": string,
+    "engCategory": number,
+    "engType": number,
+    "serviceLineCode": string,
+    "subServiceLineCode": string,
+    "managerialLocation": string,
+    "legalEntity": string,
+    "buCode": string,
+    "ouCode": string,
+    "muCode": string,
+    "smuCode": string,
+    "currency": string,
+    "areaId": number,
+    "pyEngageCode": string,
+    "globalServiceCode": string,
+    "openCodeErp": number,
+    "clientCode": string,
+    "clientName": string,
+    "picId": number,
+    "picName": string,
+    "eicId": number,
+    "eicName": string,
+    "dataStatus": number,
+    "dataType": number,
+    "deleted": boolean,
+    "match": boolean,
+    "dummy": boolean,
+    "closed": boolean
+}
+
+async function engagements(ids: string[]): Promise<Engagement[]> {
+    const startTime = Date.now();
+    const result = await fetch("http://192.168.207.17/server/endpoint/basic/engage/listByIds?ids=" + ids.join(), {
+        headers: {
+            "test": "7EBZfzzrPWHBmXJtl#86LDs6varwXlYF"
+        }
+    }).then((res) => res.json()).then((res) => res.data);
+    console.log("engagement view response time: ", Date.now() - startTime);
+    return result
+}
+
 export {
     staffs,
-    bookings
+    bookings,
+    engagements
 }
