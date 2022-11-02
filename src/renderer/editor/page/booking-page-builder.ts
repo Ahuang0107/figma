@@ -68,23 +68,27 @@ export class BookingPageBuilder {
         totalWidth += x;
         x = 0;
         anchorTime = originTime;
+        anchorTime.minusDay();
+        x -= cellWidth;
         while (anchorTime.ms > startTime.ms) {
-            x -= cellWidth;
+            const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
+            this.children.push(lineView);
+            const topLineView = new SkyLineView(new Rect(x, 0, 0, cellHeight), cellBorderColor);
+            tempYAChildren.push(topLineView);
+            const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
+            tempYAChildren.push(textView);
             if (skipWeekend) {
                 do {
                     anchorTime.minusDay();
                 } while (anchorTime.inWeekend())
             } else {
                 if (anchorTime.inWeekend()) {
-                    const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor);
+                    const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor, 0, false);
                     this.children.push(rectView);
                 }
                 anchorTime.minusDay();
             }
-            const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
-            this.children.push(lineView);
-            const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
-            this.children.push(textView);
+            x -= cellWidth;
         }
         totalWidth -= x;
 
