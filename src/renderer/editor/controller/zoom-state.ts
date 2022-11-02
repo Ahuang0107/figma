@@ -3,6 +3,11 @@ import {Point} from "../base/point";
 import {IZoomListener} from "./i-zoom-listener";
 import sk from "../utils/canvas-kit";
 
+interface ZoomOption {
+    yBelowOrigin?: boolean
+    xBelowOrigin?: boolean
+}
+
 export class ZoomState implements IZoomListener {
     public scale$ = new BehaviorSubject<number>(1);
 
@@ -10,7 +15,10 @@ export class ZoomState implements IZoomListener {
 
     changed$: Observable<unknown>;
 
-    constructor() {
+    constructor(private option: ZoomOption = {
+        yBelowOrigin: true,
+        xBelowOrigin: true
+    }) {
         this.changed$ = merge(this._position$, this.scale$);
     }
 
@@ -35,7 +43,17 @@ export class ZoomState implements IZoomListener {
     }
 
     onOffset(offset: Point): void {
-        this._position$.next(this.position.minus(offset));
+        /**
+         * 这里专门针对retain表格渲染增加了不能移动到原点更上方的逻辑
+         * todo 这里最好应该是对page设置frame的限制，然后移动时保持offset在这个限制之内
+         */
+        const nextPoint = this.position.minus(offset);
+        if (!this.option.yBelowOrigin) {
+            if (nextPoint.y > 0) {
+                nextPoint.y = 0;
+            }
+        }
+        this._position$.next(nextPoint);
     }
 
     setPosition(pt: Point) {

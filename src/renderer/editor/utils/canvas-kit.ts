@@ -41,6 +41,7 @@ function prefetchFonts() {
     });
 }
 
-prefetchFonts();
+// todo 暂时用不着draw para，所以不需要专门加载字体进来了
+// prefetchFonts();
 
 export default sk;

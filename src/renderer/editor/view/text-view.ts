@@ -1,7 +1,8 @@
-import {Paragraph} from "@skeditor/canvaskit-wasm";
+import {Font, Paint} from "@skeditor/canvaskit-wasm";
 import {Rect} from "../base/rect";
-import sk, {defaultFonts} from "../utils/canvas-kit";
+import sk from "../utils/canvas-kit";
 import {SkyBaseLayerView} from "./base-layer-view";
+import {Point} from "../base/point";
 
 export class SkyTextView extends SkyBaseLayerView {
     constructor(
@@ -27,13 +28,13 @@ export class SkyTextView extends SkyBaseLayerView {
     }
 }
 
-type ParaPaintInfo = { baseY: number; paraArr: [Paragraph, number][] };
+type TextPaintInfo = { text: string, position: Point; paint: Paint, font: Font };
 
 class TextPainter {
     constructor(private view: SkyTextView) {
     }
 
-    private _cachePaintInfo?: ParaPaintInfo;
+    private _cachePaintInfo?: TextPaintInfo;
 
     get cachePaintInfo() {
         if (!this._cachePaintInfo) {
@@ -46,46 +47,26 @@ class TextPainter {
         this.paintWith(this.cachePaintInfo);
     }
 
-    private buildPaintInfo(): ParaPaintInfo {
-        const {fontProvider} = this.view.ctx;
-        const {text} = this.view;
-
-        const lines = text.split(/\r\n|\r|\n/);
-        let curY = 0;
-        const paraArr = lines.map((line) => {
-            const paraStyle = new sk.CanvasKit.ParagraphStyle({
-                textStyle: {
-                    color: this.view.fillColor,
-                    fontFamilies: defaultFonts,
-                    fontSize: this.view.fontSize,
-                },
-                textAlign: sk.CanvasKit.TextAlign.Left,
-                maxLines: 1,
-                ellipsis: '...',
-            });
-            const builder = sk.CanvasKit.ParagraphBuilder.MakeFromFontProvider(paraStyle, fontProvider);
-            builder.addText(line);
-            builder.pop();
-            const para = builder.build();
-            builder.delete();
-            para.layout(this.view.rect.width);
-            const ret = [para, curY] as [Paragraph, number];
-            curY += para.getHeight();
-            return ret;
-        });
+    private buildPaintInfo(): TextPaintInfo {
+        const {rect, text, fontSize, fillColor} = this.view;
+        const paint = new sk.CanvasKit.Paint();
+        paint.setColor(fillColor);
+        paint.setAntiAlias(true);
+        const font = new sk.CanvasKit.Font();
+        font.setSize(fontSize);
         return {
-            baseY: this.view.rect.y,
-            paraArr,
+            text,
+            position: rect.leftTop,
+            paint,
+            font,
         };
     }
 
-    private paintWith(paintInfo: ParaPaintInfo | undefined) {
+    private paintWith(paintInfo: TextPaintInfo | undefined) {
         if (!paintInfo) return;
-        const {paraArr, baseY} = paintInfo;
+        const {text, position, paint, font} = paintInfo;
         const {skCanvas} = this.view.ctx;
 
-        paraArr.forEach(([para, y]) => {
-            skCanvas.drawParagraph(para, this.view.rect.x, y + baseY);
-        });
+        skCanvas.drawText(text, position.x, position.y, paint, font);
     }
 }

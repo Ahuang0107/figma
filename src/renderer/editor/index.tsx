@@ -1,16 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {CanvasView} from "./view/canvas-view";
-import {initPageView} from "./page/booking-page";
 
 export class Canvas extends React.Component {
     private myRef: React.LegacyRef<HTMLDivElement>;
     private skyView: CanvasView;
 
     async componentDidMount() {
+        const startTime = Date.now();
         const canvasContainer: HTMLDivElement = ReactDOM.findDOMNode(this) as HTMLDivElement;
         this.skyView = await CanvasView.create(canvasContainer);
-        initPageView(this.skyView.pageView);
+        // initPageView(this.skyView.pageView);
+        console.log("create canvas cost: ", Date.now() - startTime);
     }
 
     render(): JSX.Element {

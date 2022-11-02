@@ -63,7 +63,7 @@ export async function initPageView(pageView: SkyPageView) {
                 const pathView = new SkyRectView(pageRect, fillColor);
                 pageView.push(pathView);
                 /*数据量一上去paragraphs构建就报错了，请求2000个staff和一整年booking的数据量全部构建渲染信息会报错*/
-                const textView = new SkyTextView(new Rect(beforeStart, y + 5, during - 10, cellHeight), engagementName);
+                const textView = new SkyTextView(new Rect(beforeStart + 5, y + 14, during, cellHeight), engagementName.slice(0, 10), 12);
                 pageView.push(textView);
             });
             y += cellHeight;

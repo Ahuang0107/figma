@@ -1,37 +1,84 @@
+import moment from "moment";
+
 export class TimeStamp {
     static WEEK_DURING = 604800000;
     static WORKDAY_DURING = 432000000;
     static DAY_DURING = 86400000;
     static HOUR_DURING = 3600000;
 
-    constructor(public milliseconds: number) {
+    constructor(private milliseconds: number) {
+    }
+
+    get ms(): number {
+        return this.milliseconds
     }
 
     static from(milliseconds: number): TimeStamp {
         return new TimeStamp(milliseconds)
     }
 
-    loop(step: number, end: TimeStamp, op: (time: TimeStamp) => void) {
-        let start = this.milliseconds;
-        while (start < end.milliseconds) {
-            op(TimeStamp.from(start));
-            start += step;
-        }
+    static now(): TimeStamp {
+        return new TimeStamp(Date.now())
     }
-}
 
-enum ViewType {
-    Day,
-    Week,
-    Month
-}
+    toCurrentMonNine(): TimeStamp {
+        const now = moment(this.milliseconds);
+        now.weekday(1);
+        now.hours(9);
+        now.minutes(0);
+        now.seconds(0);
+        now.milliseconds(0);
+        return new TimeStamp(now.valueOf())
+    }
 
-const CELL_WIDTH = 18;
+    subtract(milliseconds: number): TimeStamp {
+        this.milliseconds = this.milliseconds - milliseconds;
+        return this
+    }
 
-export class TimeStampConverter {
-    constructor(
-        private base: number = Date.now(),
-        private viewType: ViewType = ViewType.Day
-    ) {
+    format(): string {
+        return moment(this.milliseconds).format()
+    }
+
+    /**
+     * self和other相差的毫秒数
+     * 2022-01-01和2022-01-16相差15天 -15
+     * @param other
+     */
+    distance(other: TimeStamp): TimeStamp {
+        return TimeStamp.from(this.milliseconds - other.milliseconds)
+    }
+
+    days(): number {
+        return this.milliseconds / 1000 / 60 / 60 / 24
+    }
+
+    debugWeekday(): string {
+        return moment(this.milliseconds).format("ddd")
+    }
+
+    inWeekend(): boolean {
+        const weekday = moment(this.milliseconds).weekday()
+        return weekday == 6 || weekday == 0
+    }
+
+    plusDay(): this {
+        this.milliseconds += TimeStamp.DAY_DURING;
+        return this
+    }
+
+    minusDay(): this {
+        this.milliseconds -= TimeStamp.DAY_DURING;
+        return this
+    }
+
+    plusHour(): this {
+        this.milliseconds += TimeStamp.HOUR_DURING;
+        return this
+    }
+
+    minusHour(): this {
+        this.milliseconds += TimeStamp.HOUR_DURING;
+        return this
     }
 }

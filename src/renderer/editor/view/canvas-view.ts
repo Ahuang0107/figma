@@ -11,6 +11,7 @@ import {debounceTime} from "rxjs/operators";
 import {initCellView} from "../page/init-cell-page";
 import {SkyBaseLayerView} from "./base-layer-view";
 import {PointerController} from "../controller/poniter-controller";
+import {TimeStamp} from "../utils/time-stamp";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -46,7 +47,11 @@ export class CanvasView extends Disposable {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
         canvasView.fontProvider = getFontProvider();
-        canvasView.pageView = await initCellView();
+        canvasView.pageView = await initCellView({
+            startTime: TimeStamp.from(Date.UTC(2021, 0, 1)),
+            endTime: TimeStamp.from(Date.UTC(2024, 0, 1)),
+            row: 2000,
+        });
         canvasView.startTick();
         return canvasView;
     }

@@ -12,7 +12,9 @@ export class SkyPageView extends SkyBaseLayerView {
 
     constructor() {
         super(new Rect());
-        this.zoomState = new ZoomState();
+        this.zoomState = new ZoomState({
+            yBelowOrigin: false
+        });
         this.initController();
     }
 
