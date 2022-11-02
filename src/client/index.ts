@@ -53,7 +53,7 @@ interface Staff {
 
 async function staffs(start: number, size: number): Promise<Staff[]> {
     const startTime = Date.now();
-    const result = await fetch("http://192.168.207.17/server/endpoint/basic/staff/listByViewConfig", {
+    const result: Staff[] = await fetch("http://192.168.207.17/server/endpoint/basic/staff/listByViewConfig", {
         method: "post",
         headers: {
             "Content-Type": "application/json",
@@ -77,7 +77,7 @@ async function staffs(start: number, size: number): Promise<Staff[]> {
             }]
         })
     }).then((res) => res.json()).then((res) => res.data);
-    console.log("staff view response time: ", Date.now() - startTime);
+    console.log(`staff view response time: ${Date.now() - startTime}  with ${result.length} rows`);
     return result
 }
 
@@ -113,7 +113,7 @@ async function bookings(staffIds: string, startDate: number, endDate: number): P
             viewConditionQOS: []
         })
     }).then((res) => res.json()).then((res) => res.data);
-    console.log("booking view response time: ", Date.now() - startTime);
+    console.log(`booking view response time: ${Date.now() - startTime}`);
     return result
 }
 
@@ -157,12 +157,12 @@ interface Engagement {
 
 async function engagements(ids: string[]): Promise<Engagement[]> {
     const startTime = Date.now();
-    const result = await fetch("http://192.168.207.17/server/endpoint/basic/engage/listByIds?ids=" + ids.join(), {
+    const result: Engagement[] = await fetch("http://192.168.207.17/server/endpoint/basic/engage/listByIds?ids=" + ids.join(), {
         headers: {
             "test": "7EBZfzzrPWHBmXJtl#86LDs6varwXlYF"
         }
     }).then((res) => res.json()).then((res) => res.data);
-    console.log("engagement view response time: ", Date.now() - startTime);
+    console.log(`engagement view response time: ${Date.now() - startTime} with ${result.length} rows`);
     return result
 }
 

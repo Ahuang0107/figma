@@ -49,6 +49,31 @@ export class TimeStamp {
         return TimeStamp.from(this.milliseconds - other.milliseconds)
     }
 
+    betweenWorkdays(other: TimeStamp): number {
+        let start, end, flag;
+        if (this.ms < other.ms) {
+            start = this.copy();
+            end = other.copy();
+            flag = 1;
+        } else {
+            start = other.copy();
+            end = this.copy();
+            flag = -1;
+        }
+        let result = 0;
+        while (start.ms < end.ms) {
+            if (!start.inWeekend()) {
+                result += 1;
+            }
+            do {
+                start.plusDay()
+            } while (start.inWeekend())
+        }
+        // todo 用weeksInYear的逻辑可能效率更高
+        // moment(this.ms).weeksInYear()
+        return result * flag
+    }
+
     days(): number {
         return this.milliseconds / 1000 / 60 / 60 / 24
     }
@@ -80,5 +105,9 @@ export class TimeStamp {
     minusHour(): this {
         this.milliseconds += TimeStamp.HOUR_DURING;
         return this
+    }
+
+    copy(): TimeStamp {
+        return TimeStamp.from(this.ms)
     }
 }

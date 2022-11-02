@@ -1,5 +1,5 @@
 import {Canvas, GrDirectContext, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
-import {CanvasKitPromised, getFontProvider} from "../utils";
+import {CanvasKitPromised} from "../utils";
 import {BehaviorSubject, Observable} from "rxjs";
 import sk from "../utils/canvas-kit";
 import {Rect} from "../base/rect";
@@ -8,10 +8,8 @@ import invariant from "ts-invariant";
 import {SkyPageView} from "./page-view";
 import {PageState} from "./page-state";
 import {debounceTime} from "rxjs/operators";
-import {initCellView} from "../page/init-cell-page";
 import {SkyBaseLayerView} from "./base-layer-view";
 import {PointerController} from "../controller/poniter-controller";
-import {TimeStamp} from "../utils/time-stamp";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -46,13 +44,7 @@ export class CanvasView extends Disposable {
     static async create(foreignEl: HTMLElement) {
         await CanvasKitPromised;
         const canvasView = new CanvasView(foreignEl);
-        canvasView.fontProvider = getFontProvider();
-        canvasView.pageView = await initCellView({
-            startTime: TimeStamp.from(Date.UTC(2021, 0, 1)),
-            endTime: TimeStamp.from(Date.UTC(2024, 0, 1)),
-            row: 2000,
-        });
-        canvasView.startTick();
+        canvasView.pageView = new SkyPageView();
         return canvasView;
     }
 
@@ -111,7 +103,7 @@ export class CanvasView extends Disposable {
         canvasEl.height = canvasHeight;
     }
 
-    private startTick() {
+    startTick() {
         const handler = () => {
             if (this._disposed) return;
             this.render();

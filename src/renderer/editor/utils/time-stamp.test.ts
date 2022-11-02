@@ -24,4 +24,19 @@ describe('TimeStamp Test', () => {
         // 2022-01-03 Mon
         expect(TimeStamp.from(1641139200000).inWeekend()).toEqual(false);
     });
+
+    test('betweenWorkdays test', () => {
+        // 2022-01-01
+        let start = TimeStamp.from(1640966400000);
+        // 2022-01-16
+        let end = TimeStamp.from(1642262400000);
+        expect(start.betweenWorkdays(end)).toEqual(10);
+        expect(end.betweenWorkdays(start)).toEqual(-10);
+        // 2022-11-02
+        start = TimeStamp.from(1667349275000);
+        // 2022-12-04
+        end = TimeStamp.from(1670083200000);
+        expect(start.betweenWorkdays(end)).toEqual(23);
+        expect(end.betweenWorkdays(start)).toEqual(-23);
+    });
 });
