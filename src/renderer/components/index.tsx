@@ -26,26 +26,26 @@ class App extends React.Component<AppProps> {
         return (
             <div id="body" style={pallet}>
                 {/*<div className="electron-top-panel"></div>*/}
-                {/*<div className="editor-tools-panel">*/}
-                {/*    <div className="action"></div>*/}
-                {/*    <div className="tools">*/}
-                {/*        <Button multiIcon={"MoveIcon"}/>*/}
-                {/*        <Button multiIcon={"FrameIcon"}/>*/}
-                {/*        <Button multiIcon={"RectangleIcon"}/>*/}
-                {/*        <Button multiIcon={"PenIcon"}/>*/}
-                {/*        <Button icon={"TextIcon"}/>*/}
-                {/*        <Button icon={"HandIcon"}/>*/}
-                {/*        <Button icon={"CommentIcon"}/>*/}
-                {/*    </div>*/}
-                {/*    <div className="title"></div>*/}
-                {/*    <div className="function"></div>*/}
-                {/*</div>*/}
+                <div className="editor-tools-panel">
+                    <div className="action"></div>
+                    <div className="tools">
+                        <Button multiIcon={"MoveIcon"}/>
+                        <Button multiIcon={"FrameIcon"}/>
+                        <Button multiIcon={"RectangleIcon"}/>
+                        <Button multiIcon={"PenIcon"}/>
+                        <Button icon={"TextIcon"}/>
+                        <Button icon={"HandIcon"}/>
+                        <Button icon={"CommentIcon"}/>
+                    </div>
+                    <div className="title"></div>
+                    <div className="function"></div>
+                </div>
                 <div className="editor-edit-panel">
-                    {/*<div className="layout-manager-panel"></div>*/}
+                    <div className="layout-manager-panel"></div>
                     <div className="canvas-panel">
                         <Canvas/>
                     </div>
-                    {/*<div className="property-panel"></div>*/}
+                    <div className="property-panel"></div>
                 </div>
             </div>
         )

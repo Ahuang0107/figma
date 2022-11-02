@@ -18,8 +18,8 @@ export abstract class SkyBaseLayerView extends SkyBaseView {
 
     abstract _render(): void;
 
-    containsPoint(pt: Point) {
+    containsPoint(pt: Point, offsetX?: number, offsetY?: number) {
         const offset = this.ctx.pageView.transform.position;
-        return this.frame.containsPoint(pt.minus(new Point(offset.x, offset.y)));
+        return this.frame.containsPoint(pt.minus(new Point(offsetX ?? offset.x, offsetY ?? offset.y)));
     }
 }

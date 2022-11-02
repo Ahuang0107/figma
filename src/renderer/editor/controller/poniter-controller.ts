@@ -64,6 +64,24 @@ export class PointerController extends Disposable {
     }
 
     private findViewFirst(pageView: SkyPageView, pt: Point): SkyBaseLayerView | undefined {
+        for (let i = pageView.absoluteChildren.length - 1; i >= 0; i--) {
+            const layer = pageView.absoluteChildren[i];
+            if (layer.enableHover && layer.containsPoint(pt, 0, 0)) {
+                return layer;
+            }
+        }
+        for (let i = pageView.xAbsoluteChildren.length - 1; i >= 0; i--) {
+            const layer = pageView.xAbsoluteChildren[i];
+            if (layer.enableHover && layer.containsPoint(pt, 0, null)) {
+                return layer;
+            }
+        }
+        for (let i = pageView.yAbsoluteChildren.length - 1; i >= 0; i--) {
+            const layer = pageView.yAbsoluteChildren[i];
+            if (layer.enableHover && layer.containsPoint(pt, null, 0)) {
+                return layer;
+            }
+        }
         for (let i = pageView.children.length - 1; i >= 0; i--) {
             const layer = pageView.children[i];
             if (layer.enableHover && layer.containsPoint(pt)) {

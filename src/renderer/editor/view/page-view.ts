@@ -9,6 +9,9 @@ export class SkyPageView extends SkyBaseLayerView {
     controller!: ZoomController;
     transform = new Transform();
     children: SkyBaseLayerView[] = [];
+    absoluteChildren: SkyBaseLayerView[] = [];
+    xAbsoluteChildren: SkyBaseLayerView[] = [];
+    yAbsoluteChildren: SkyBaseLayerView[] = [];
 
     constructor() {
         super(new Rect());
@@ -22,25 +25,49 @@ export class SkyPageView extends SkyBaseLayerView {
         this.children.push(view)
     }
 
+    pushA<T extends SkyBaseLayerView>(view: T) {
+        this.absoluteChildren.push(view)
+    }
+
+    pushAX<T extends SkyBaseLayerView>(view: T) {
+        this.xAbsoluteChildren.push(view)
+    }
+
+    pushAY<T extends SkyBaseLayerView>(view: T) {
+        this.yAbsoluteChildren.push(view)
+    }
+
     _render() {
-        this.applyTransform();
+        const {skCanvas} = this.ctx;
+        const {position} = this.zoomState;
+        this.absoluteChildren.forEach(child => {
+            child.render();
+        })
+
+        let saveCount = skCanvas.save();
+        this.transform.position.set(position.x, 0);
+        this.transform.updateLocalTransform();
+        skCanvas.concat(this.transform.localTransform.toArray(false));
+        this.yAbsoluteChildren.forEach(child => {
+            child.render();
+        })
+        skCanvas.restoreToCount(saveCount);
+
+        saveCount = skCanvas.save();
+        this.transform.position.set(0, position.y);
+        this.transform.updateLocalTransform();
+        skCanvas.concat(this.transform.localTransform.toArray(false));
+        this.xAbsoluteChildren.forEach(child => {
+            child.render();
+        })
+        skCanvas.restoreToCount(saveCount);
+
+        this.transform.position.set(position.x, position.y);
+        this.transform.updateLocalTransform();
+        skCanvas.concat(this.transform.localTransform.toArray(false));
         this.children.forEach(child => {
             child.render();
         })
-    }
-
-    updateTransform() {
-        const {position, scale} = this.zoomState;
-        this.transform.position.set(position.x, position.y);
-        this.transform.scale.set(scale, scale);
-        this.transform.updateLocalTransform();
-    }
-
-    protected applyTransform() {
-        const {skCanvas} = this.ctx;
-        this.updateTransform();
-        const arr = this.transform.localTransform.toArray(false);
-        skCanvas.concat(arr);
     }
 
     private initController() {
