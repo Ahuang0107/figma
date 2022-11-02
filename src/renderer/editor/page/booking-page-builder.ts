@@ -44,11 +44,14 @@ export class BookingPageBuilder {
 
         let x = 0;
         let anchorTime = originTime;
+        const tempYAChildren = [];
         while (anchorTime.ms < endTime.ms) {
             const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
-            this.cellLayers.push(lineView);
+            this.children.push(lineView);
+            const topLineView = new SkyLineView(new Rect(x, 0, 0, cellHeight), cellBorderColor);
+            tempYAChildren.push(topLineView);
             const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
-            this.cellLayers.push(textView);
+            tempYAChildren.push(textView);
             if (skipWeekend) {
                 do {
                     anchorTime.plusDay();
@@ -56,7 +59,7 @@ export class BookingPageBuilder {
             } else {
                 if (anchorTime.inWeekend()) {
                     const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor, 0, false);
-                    this.cellLayers.push(rectView);
+                    this.children.push(rectView);
                 }
                 anchorTime.plusDay();
             }
@@ -74,22 +77,30 @@ export class BookingPageBuilder {
             } else {
                 if (anchorTime.inWeekend()) {
                     const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor);
-                    this.cellLayers.push(rectView);
+                    this.children.push(rectView);
                 }
                 anchorTime.minusDay();
             }
             const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
-            this.cellLayers.push(lineView);
+            this.children.push(lineView);
             const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
-            this.cellLayers.push(textView);
+            this.children.push(textView);
         }
         totalWidth -= x;
 
+        const topBgView = new SkyRectView(new Rect(x, 0, totalWidth, cellHeight), sk.CanvasKit.WHITE, 0, false);
+        this.yAbsoluteChildren.push(topBgView);
+        this.yAbsoluteChildren.push(...tempYAChildren);
+
         let index = 0;
+        const y = index * cellHeight;
+        const lineView = new SkyLineView(new Rect(x, y, totalWidth, 0), cellBorderColor);
+        this.yAbsoluteChildren.push(lineView);
+        index++;
         while (index < row) {
             const y = index * cellHeight;
             const lineView = new SkyLineView(new Rect(x, y, totalWidth, 0), cellBorderColor);
-            this.cellLayers.push(lineView);
+            this.children.push(lineView);
             index++;
         }
     }

@@ -30,30 +30,33 @@ export class Canvas extends React.Component {
             endTime: TimeStamp.from(Date.UTC(2024, 0, 1)),
             row: 2000,
         });
-        this.pageBuilder.initCellTopInfo().then(() => {
+        // this.pageBuilder.initCellTopInfo().then(() => {
+        //     this.skyView.pageView.pushAY(this.pageBuilder.yAbsoluteChildren);
+        //     this.skyView.markDirty();
+        // });
+        // this.pageBuilder.initCellLeftTopInfo().then(() => {
+        //     this.skyView.pageView.pushA(this.pageBuilder.absoluteChildren);
+        //     this.skyView.markDirty();
+        // });
+        // this.pageBuilder.initCellLeftInfo().then(() => {
+        //     this.skyView.pageView.pushAX(this.pageBuilder.xAbsoluteChildren);
+        //     this.skyView.markDirty();
+        // });
+        // this.pageBuilder.initCellContentInfo().then(() => {
+        //     this.skyView.pageView.push(this.pageBuilder.children);
+        //     this.skyView.markDirty();
+        // });
+        this.pageBuilder.initCellViewInfo().then(() => {
+            this.skyView.pageView.push(this.pageBuilder.children);
+            this.skyView.pageView.pushA(this.pageBuilder.absoluteChildren);
+            this.skyView.pageView.pushAX(this.pageBuilder.xAbsoluteChildren);
             this.skyView.pageView.pushAY(this.pageBuilder.yAbsoluteChildren);
             this.skyView.markDirty();
+            // this.pageBuilder.initBookingViewInfo().then(() => {
+            //     this.skyView.pageView.children.push(...this.pageBuilder.bookingLayers);
+            //     this.skyView.markDirty();
+            // })
         });
-        this.pageBuilder.initCellLeftTopInfo().then(() => {
-            this.skyView.pageView.pushA(this.pageBuilder.absoluteChildren);
-            this.skyView.markDirty();
-        });
-        this.pageBuilder.initCellLeftInfo().then(() => {
-            this.skyView.pageView.pushAX(this.pageBuilder.xAbsoluteChildren);
-            this.skyView.markDirty();
-        });
-        this.pageBuilder.initCellContentInfo().then(() => {
-            this.skyView.pageView.push(this.pageBuilder.children);
-            this.skyView.markDirty();
-        });
-        // this.pageBuilder.initCellViewInfo().then(() => {
-        //     this.skyView.pageView.children = this.pageBuilder.cellLayers
-        //     this.skyView.markDirty();
-        //     this.pageBuilder.initBookingViewInfo().then(() => {
-        //         this.skyView.pageView.children.push(...this.pageBuilder.bookingLayers);
-        //         this.skyView.markDirty();
-        //     })
-        // });
         this.skyView.startTick();
         console.log("create canvas cost: ", Date.now() - startTime);
     }

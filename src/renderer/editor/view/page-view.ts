@@ -78,9 +78,6 @@ export class SkyPageView extends SkyBaseLayerView {
         this.transform.position.set(position.x, position.y);
         this.transform.updateLocalTransform();
         skCanvas.concat(this.transform.localTransform.toArray(false));
-        this.children.forEach(child => {
-            child.render();
-        })
     }
 
     private initController() {
