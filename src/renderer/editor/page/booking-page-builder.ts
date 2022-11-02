@@ -18,10 +18,15 @@ export class BookingPageBuilder {
     cellLayers: SkyBaseLayerView[] = [];
     bookingLayers: SkyBaseLayerView[] = [];
 
+    children: SkyBaseLayerView[] = [];
+    absoluteChildren: SkyBaseLayerView[] = [];
+    xAbsoluteChildren: SkyBaseLayerView[] = [];
+    yAbsoluteChildren: SkyBaseLayerView[] = [];
+
     constructor(private config: RetainCellConfig) {
     }
 
-    async initCellViewInfo(): Promise<SkyBaseLayerView[]> {
+    async initCellViewInfo() {
         const {
             startTime,
             endTime,
@@ -87,7 +92,6 @@ export class BookingPageBuilder {
             this.cellLayers.push(lineView);
             index++;
         }
-        return this.cellLayers
     }
 
     async fetchBookingInfo() {
@@ -95,7 +99,7 @@ export class BookingPageBuilder {
         // 需要去计算booking离原点那天相聚几天？需不需要排除周末？然后当天是否占满整个格子
     }
 
-    async initBookingViewInfo(): Promise<SkyBaseLayerView[]> {
+    async initBookingViewInfo() {
         const {skipWeekend = false} = this.config;
         const originTime = TimeStamp.now().toCurrentMonNine();
         const cellWidth = 25;
@@ -157,6 +161,31 @@ export class BookingPageBuilder {
             })
         })
         console.log("iter data time: ", Date.now() - startTime);
-        return this.bookingLayers
+    }
+
+    async initCellContentInfo() {
+        for (let i = 200; i < 700; i += 10) {
+            for (let j = 200; j < 700; j += 10) {
+                this.children.push(new SkyRectView(new Rect(i, j, 5, 5), sk.CanvasKit.BLACK))
+            }
+        }
+    }
+
+    async initCellLeftTopInfo() {
+        this.absoluteChildren.push(new SkyRectView(new Rect(0, 0, 10, 10), sk.CanvasKit.YELLOW))
+    }
+
+    async initCellTopInfo() {
+        this.yAbsoluteChildren.push(new SkyRectView(new Rect(10, 0, 1000, 10), sk.CanvasKit.GREEN))
+        for (let i = 10; i < 1000; i += 10) {
+            this.yAbsoluteChildren.push(new SkyLineView(new Rect(i, 0, 0, 10), sk.CanvasKit.BLACK))
+        }
+    }
+
+    async initCellLeftInfo() {
+        this.xAbsoluteChildren.push(new SkyRectView(new Rect(0, 10, 10, 1000), sk.CanvasKit.BLUE))
+        for (let i = 10; i < 1000; i += 10) {
+            this.xAbsoluteChildren.push(new SkyLineView(new Rect(0, i, 10, 0), sk.CanvasKit.BLACK))
+        }
     }
 }

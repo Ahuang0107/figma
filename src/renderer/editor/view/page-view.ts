@@ -21,30 +21,38 @@ export class SkyPageView extends SkyBaseLayerView {
         this.initController();
     }
 
-    push<T extends SkyBaseLayerView>(view: T) {
-        this.children.push(view)
+    push<T extends SkyBaseLayerView>(views: T[]) {
+        this.children.push(...views)
     }
 
-    pushA<T extends SkyBaseLayerView>(view: T) {
-        this.absoluteChildren.push(view)
+    pushA<T extends SkyBaseLayerView>(views: T[]) {
+        this.absoluteChildren.push(...views)
     }
 
-    pushAX<T extends SkyBaseLayerView>(view: T) {
-        this.xAbsoluteChildren.push(view)
+    pushAX<T extends SkyBaseLayerView>(views: T[]) {
+        this.xAbsoluteChildren.push(...views)
     }
 
-    pushAY<T extends SkyBaseLayerView>(view: T) {
-        this.yAbsoluteChildren.push(view)
+    pushAY<T extends SkyBaseLayerView>(views: T[]) {
+        this.yAbsoluteChildren.push(...views)
     }
 
     _render() {
         const {skCanvas} = this.ctx;
         const {position} = this.zoomState;
-        this.absoluteChildren.forEach(child => {
+
+        let saveCount;
+        /* 先渲染中间的内容，因为其他三个部分都要覆盖在上面*/
+        saveCount = skCanvas.save();
+        this.transform.position.set(position.x, position.y);
+        this.transform.updateLocalTransform();
+        skCanvas.concat(this.transform.localTransform.toArray(false));
+        this.children.forEach(child => {
             child.render();
         })
+        skCanvas.restoreToCount(saveCount);
 
-        let saveCount = skCanvas.save();
+        saveCount = skCanvas.save();
         this.transform.position.set(position.x, 0);
         this.transform.updateLocalTransform();
         skCanvas.concat(this.transform.localTransform.toArray(false));
@@ -62,6 +70,11 @@ export class SkyPageView extends SkyBaseLayerView {
         })
         skCanvas.restoreToCount(saveCount);
 
+        this.absoluteChildren.forEach(child => {
+            child.render();
+        })
+
+        /* 最后还是要记得将offset设置回正确的值 */
         this.transform.position.set(position.x, position.y);
         this.transform.updateLocalTransform();
         skCanvas.concat(this.transform.localTransform.toArray(false));
