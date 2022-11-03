@@ -47,15 +47,16 @@ export class Canvas extends React.Component {
         //     this.skyView.markDirty();
         // });
         this.pageBuilder.initCellViewInfo().then(() => {
-            this.skyView.pageView.push(this.pageBuilder.children);
-            this.skyView.pageView.pushA(this.pageBuilder.absoluteChildren);
-            this.skyView.pageView.pushAX(this.pageBuilder.xAbsoluteChildren);
-            this.skyView.pageView.pushAY(this.pageBuilder.yAbsoluteChildren);
+            this.skyView.pageView.push(this.pageBuilder.cellLayers.children);
+            this.skyView.pageView.pushA(this.pageBuilder.cellLayers.absoluteChildren);
+            this.skyView.pageView.pushAX(this.pageBuilder.cellLayers.xAbsoluteChildren);
+            this.skyView.pageView.pushAY(this.pageBuilder.cellLayers.yAbsoluteChildren);
             this.skyView.markDirty();
-            // this.pageBuilder.initBookingViewInfo().then(() => {
-            //     this.skyView.pageView.children.push(...this.pageBuilder.bookingLayers);
-            //     this.skyView.markDirty();
-            // })
+            this.pageBuilder.initBookingViewInfo().then(() => {
+                this.skyView.pageView.push(this.pageBuilder.bookingLayers.children);
+                this.skyView.loading = false;
+                this.skyView.markDirty();
+            })
         });
         this.skyView.startTick();
         console.log("create canvas cost: ", Date.now() - startTime);

@@ -1,4 +1,4 @@
-import {Canvas, GrDirectContext, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
+import {Canvas, GrDirectContext, SkottieAnimation, Surface, TypefaceFontProvider} from "@skeditor/canvaskit-wasm";
 import {CanvasKitPromised} from "../utils";
 import {BehaviorSubject, Observable} from "rxjs";
 import sk from "../utils/canvas-kit";
@@ -10,6 +10,7 @@ import {PageState} from "./page-state";
 import {debounceTime} from "rxjs/operators";
 import {SkyBaseLayerView} from "./base-layer-view";
 import {PointerController} from "../controller/poniter-controller";
+import loadingJson from "../../../assets/lottie/8370-loading.json";
 
 export class CanvasView extends Disposable {
     static currentContext: CanvasView;
@@ -25,12 +26,21 @@ export class CanvasView extends Disposable {
     pageView?: SkyPageView;
     private dirty = true;
 
+    loading: boolean = true;
+    animation: SkottieAnimation;
+    firstFrame: number;
+    duration: number;
+
     protected constructor(private foreignEl: HTMLElement) {
         super();
         CanvasView.currentContext = this;
 
         this.createCanvasEl();
         this.attachParentNode(foreignEl);
+
+        this.animation = sk.CanvasKit.MakeAnimation(JSON.stringify(loadingJson));
+        this.firstFrame = new Date().getTime();
+        this.duration = this.animation.duration();
 
         this._disposables.push(
             this.pageState.changed.subscribe(() => {
@@ -107,8 +117,10 @@ export class CanvasView extends Disposable {
         const handler = () => {
             if (this._disposed) return;
             this.render();
+            // requestAnimationFrame(handler);
             setTimeout(handler, 16);
         };
+        // requestAnimationFrame(handler);
         setTimeout(handler, 16);
     }
 
@@ -142,12 +154,23 @@ export class CanvasView extends Disposable {
             const start = Date.now();
             this.skCanvas.save();
             this.skCanvas.scale(this.dpi, this.dpi);
-            this.pageView?.render();
+            if (this.loading) {
+                let now = new Date().getTime();
+                let seek = ((now - this.firstFrame) / (this.duration * 1000)) % 1.0;
+                this.animation.seek(seek);
+                const width = this.canvasEl$.value.width;
+                const height = this.canvasEl$.value.height;
+                this.animation.render(this.skCanvas, sk.CanvasKit.XYWHRect((width - 500) / 2, (height - 500) / 2, 500, 500));
+            } else {
+                this.pageView?.render();
+            }
             this.skCanvas.restore();
             this.skSurface.flush();
             console.log('>>> render costs:', Date.now() - start);
         }
-        this.dirty = false;
+        if (!this.loading) {
+            this.dirty = false;
+        }
     }
 
     selectLayer(layer: SkyBaseLayerView | undefined) {

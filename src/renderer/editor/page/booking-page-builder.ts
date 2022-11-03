@@ -14,14 +14,31 @@ interface RetainCellConfig {
     skipWeekend?: boolean
 }
 
-export class BookingPageBuilder {
-    cellLayers: SkyBaseLayerView[] = [];
-    bookingLayers: SkyBaseLayerView[] = [];
+class LayerGroup {
+    constructor(
+        public children: SkyBaseLayerView[] = [],
+        public absoluteChildren: SkyBaseLayerView[] = [],
+        public xAbsoluteChildren: SkyBaseLayerView[] = [],
+        public yAbsoluteChildren: SkyBaseLayerView[] = []
+    ) {
+    }
+}
 
-    children: SkyBaseLayerView[] = [];
-    absoluteChildren: SkyBaseLayerView[] = [];
-    xAbsoluteChildren: SkyBaseLayerView[] = [];
-    yAbsoluteChildren: SkyBaseLayerView[] = [];
+class TableInfo {
+    constructor() {
+    }
+}
+
+/*
+* todo 首先需要将基础的渲染逻辑和与业务相关的渲染逻辑区分开来
+*  其次对于业务相关的渲染，应该可以再封装一层显示一个单元格和文字的view
+*  然后对于overlay的显示，也是针对这个封装好的view，添加一个overlay的信息，在鼠标hover或者focus时增加不同的渲染逻辑
+* */
+export class BookingPageBuilder {
+    headBgColor = sk.CanvasKit.Color(112, 173, 71);
+    leftTable: TableInfo;
+    cellLayers: LayerGroup = new LayerGroup();
+    bookingLayers: LayerGroup = new LayerGroup();
 
     constructor(private config: RetainCellConfig) {
     }
@@ -47,7 +64,7 @@ export class BookingPageBuilder {
         const tempYAChildren = [];
         while (anchorTime.ms < endTime.ms) {
             const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
-            this.children.push(lineView);
+            this.cellLayers.children.push(lineView);
             const topLineView = new SkyLineView(new Rect(x, 0, 0, cellHeight), cellBorderColor);
             tempYAChildren.push(topLineView);
             const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
@@ -59,7 +76,7 @@ export class BookingPageBuilder {
             } else {
                 if (anchorTime.inWeekend()) {
                     const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor, 0, false);
-                    this.children.push(rectView);
+                    this.cellLayers.children.push(rectView);
                 }
                 anchorTime.plusDay();
             }
@@ -72,7 +89,7 @@ export class BookingPageBuilder {
         x -= cellWidth;
         while (anchorTime.ms > startTime.ms) {
             const lineView = new SkyLineView(new Rect(x, 0, 0, totalHeight), cellBorderColor);
-            this.children.push(lineView);
+            this.cellLayers.children.push(lineView);
             const topLineView = new SkyLineView(new Rect(x, 0, 0, cellHeight), cellBorderColor);
             tempYAChildren.push(topLineView);
             const textView = new SkyTextView(new Rect(x, cellHeight), anchorTime.debugWeekday(), 12, sk.CanvasKit.BLACK);
@@ -84,7 +101,7 @@ export class BookingPageBuilder {
             } else {
                 if (anchorTime.inWeekend()) {
                     const rectView = new SkyRectView(new Rect(x, 0, cellWidth, totalHeight), weekendColor, 0, false);
-                    this.children.push(rectView);
+                    this.cellLayers.children.push(rectView);
                 }
                 anchorTime.minusDay();
             }
@@ -93,18 +110,18 @@ export class BookingPageBuilder {
         totalWidth -= x;
 
         const topBgView = new SkyRectView(new Rect(x, 0, totalWidth, cellHeight), sk.CanvasKit.WHITE, 0, false);
-        this.yAbsoluteChildren.push(topBgView);
-        this.yAbsoluteChildren.push(...tempYAChildren);
+        this.cellLayers.yAbsoluteChildren.push(topBgView);
+        this.cellLayers.yAbsoluteChildren.push(...tempYAChildren);
 
         let index = 0;
         const y = index * cellHeight;
         const lineView = new SkyLineView(new Rect(x, y, totalWidth, 0), cellBorderColor);
-        this.yAbsoluteChildren.push(lineView);
+        this.cellLayers.yAbsoluteChildren.push(lineView);
         index++;
         while (index < row) {
             const y = index * cellHeight;
             const lineView = new SkyLineView(new Rect(x, y, totalWidth, 0), cellBorderColor);
-            this.children.push(lineView);
+            this.cellLayers.children.push(lineView);
             index++;
         }
     }
@@ -167,10 +184,10 @@ export class BookingPageBuilder {
                     const during = endDays - startDays;
                     const pageRect = new Rect(startDays * cellWidth, y, during * cellWidth, cellHeight);
                     const pathView = new SkyRectView(pageRect, fillColor);
-                    this.bookingLayers.push(pathView);
+                    this.bookingLayers.children.push(pathView);
                     /*数据量一上去paragraphs构建就报错了，请求2000个staff和一整年booking的数据量全部构建渲染信息会报错*/
                     const textView = new SkyTextView(new Rect(startDays * cellWidth, y + 14, during * cellWidth, cellHeight), engagementName.slice(0, 10), 12, sk.CanvasKit.BLACK);
-                    this.bookingLayers.push(textView);
+                    this.bookingLayers.children.push(textView);
                 });
                 y += cellHeight;
             })
@@ -181,26 +198,26 @@ export class BookingPageBuilder {
     async initCellContentInfo() {
         for (let i = 200; i < 700; i += 10) {
             for (let j = 200; j < 700; j += 10) {
-                this.children.push(new SkyRectView(new Rect(i, j, 5, 5), sk.CanvasKit.BLACK))
+                this.cellLayers.children.push(new SkyRectView(new Rect(i, j, 5, 5), sk.CanvasKit.BLACK))
             }
         }
     }
 
     async initCellLeftTopInfo() {
-        this.absoluteChildren.push(new SkyRectView(new Rect(0, 0, 10, 10), sk.CanvasKit.YELLOW))
+        this.cellLayers.absoluteChildren.push(new SkyRectView(new Rect(0, 0, 10, 10), sk.CanvasKit.YELLOW))
     }
 
     async initCellTopInfo() {
-        this.yAbsoluteChildren.push(new SkyRectView(new Rect(10, 0, 1000, 10), sk.CanvasKit.GREEN))
+        this.cellLayers.yAbsoluteChildren.push(new SkyRectView(new Rect(10, 0, 1000, 10), sk.CanvasKit.GREEN))
         for (let i = 10; i < 1000; i += 10) {
-            this.yAbsoluteChildren.push(new SkyLineView(new Rect(i, 0, 0, 10), sk.CanvasKit.BLACK))
+            this.cellLayers.yAbsoluteChildren.push(new SkyLineView(new Rect(i, 0, 0, 10), sk.CanvasKit.BLACK))
         }
     }
 
     async initCellLeftInfo() {
-        this.xAbsoluteChildren.push(new SkyRectView(new Rect(0, 10, 10, 1000), sk.CanvasKit.BLUE))
+        this.cellLayers.xAbsoluteChildren.push(new SkyRectView(new Rect(0, 10, 10, 1000), sk.CanvasKit.BLUE))
         for (let i = 10; i < 1000; i += 10) {
-            this.xAbsoluteChildren.push(new SkyLineView(new Rect(0, i, 10, 0), sk.CanvasKit.BLACK))
+            this.cellLayers.xAbsoluteChildren.push(new SkyLineView(new Rect(0, i, 10, 0), sk.CanvasKit.BLACK))
         }
     }
 }
