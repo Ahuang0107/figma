@@ -33,6 +33,10 @@ class TableInfo {
 * todo 首先需要将基础的渲染逻辑和与业务相关的渲染逻辑区分开来
 *  其次对于业务相关的渲染，应该可以再封装一层显示一个单元格和文字的view
 *  然后对于overlay的显示，也是针对这个封装好的view，添加一个overlay的信息，在鼠标hover或者focus时增加不同的渲染逻辑
+*
+* todo 想到了，其实还有跟设计软件画布渲染相同的部分，比如可以单选可以多选，右侧可以显示属性（对于retain booking来说
+*  就是booking的具体信息）那么就应该把一个booking作为一个元素，同时有booking信息和绘制信息
+*  然后
 * */
 export class BookingPageBuilder {
     headBgColor = sk.CanvasKit.Color(112, 173, 71);
